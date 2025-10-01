@@ -45,7 +45,8 @@ const CVPreview = () => {
         </div>
         {/* Work Experienct */}
         <div>
-          <h2 className="text-xl font-black mb-5">Work Experienct</h2>
+          <h2 className="text-xl font-black mb-5">Work Experience</h2>
+          <div>Loop Here</div>
         </div>
       </div>
     </div>
