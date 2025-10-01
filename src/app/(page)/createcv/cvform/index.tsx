@@ -1,8 +1,12 @@
+'use client';
+
 import { ObjectId } from 'mongodb';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { CvWithId, useCv } from '../useCv';
+// ^ adjust the import path
 
-export default function CVFormPage({ form }: { form: CvData; setForm: React.Dispatch<React.SetStateAction<CvData>> }) {
+export default function CVFormPage({ form }: { form: CvWithId }) {
   return (
     <main className="min-h-screen w-full bg-gray-50 py-10">
       <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-sm">
@@ -43,8 +47,16 @@ function RemoveButton({ onClick }: { onClick: () => void }) {
 }
 
 function CVForm({ initialData }: { initialData: CvData & { _id?: string | ObjectId } }) {
+  // 🔗 Hook: give it your server-provided initial data so there’s no flash
+  const { saveCv } = useCv({ initialData });
+
   const [form, setForm] = useState<CvData>(initialData);
   const [cvId, setCvId] = useState<string>(initialData._id?.toString() ?? '');
+
+  // if your initialData might change (e.g., client nav), keep cvId in sync
+  useEffect(() => {
+    if (initialData?._id) setCvId(initialData._id.toString());
+  }, [initialData?._id]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (field: keyof CvData, value: any) => setForm(prev => ({ ...prev, [field]: value }));
@@ -85,40 +97,13 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
     reader.readAsDataURL(file);
   };
 
-  // API helpers
-  const createCv = async (data: CvData) => {
-    const res = await fetch('/api/cv', {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to create CV');
-    return res.json() as Promise<{ id: string }>;
-  };
-
-  const updateCv = async (id: string, data: CvData) => {
-    // strip immutable/server-managed fields before sending
-
-    const res = await fetch('/api/cv', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...data }), // ✅ send id separately
-    });
-    if (!res.ok) throw new Error((await res.json()).error ?? 'Failed to update CV');
-  };
-
-  // unified submit
+  // 🧠 SUBMIT — use the hook’s unified create/update
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if (cvId) {
-        await updateCv(cvId, form);
-        alert(`Updated CV ${cvId}`);
-      } else {
-        const { id } = await createCv(form);
-        setCvId(id);
-        alert(`Created CV ${id}`);
-      }
+      const { id } = await saveCv(form); // <-- the hook decides create vs update
+      if (!cvId) setCvId(id);
+      alert(cvId ? `Updated CV ${id}` : `Created CV ${id}`);
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : 'Unexpected error');
@@ -206,7 +191,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         />
       </div>
 
-      {/* Work Experience (repeatable) */}
+      {/* Work Experience */}
       <div className="space-y-3">
         <SectionHeader
           title="Work Experience"
@@ -246,7 +231,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         ))}
       </div>
 
-      {/* Education (repeatable) */}
+      {/* Education */}
       <div className="space-y-3">
         <SectionHeader title="Education" onAdd={() => addArrayItem('education', blankEdu)} addLabel="Add Education" />
         {form.education.length === 0 && (
@@ -282,7 +267,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         ))}
       </div>
 
-      {/* Projects (repeatable) */}
+      {/* Projects */}
       <div className="space-y-3">
         <SectionHeader title="Projects" onAdd={() => addArrayItem('projects', blankProj)} addLabel="Add Project" />
         {form.projects.length === 0 && (
@@ -325,7 +310,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         ))}
       </div>
 
-      {/* Technologies (repeatable) */}
+      {/* Technologies */}
       <div className="space-y-3">
         <SectionHeader title="Technologies" onAdd={addTechnology} addLabel="Add Technology" />
         {form.technologies.length === 0 && (
