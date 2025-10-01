@@ -46,8 +46,38 @@ const CVPreview = () => {
         {/* Work Experienct */}
         <div>
           <h2 className="text-xl font-black mb-5">Work Experience</h2>
-          <div>Loop Here</div>
+          <div>
+            {/* ---1--- */}
+            <div className="mb-10">
+              <div className="text-[#05afc9] text-xl font-black mb-2">Eurosko</div>
+              <div className="flex items-center justify-between w-100 mb-2">
+                <div className="text-l font-bold">Frontend Developer</div>
+                <div className="text-[#6b7280] text-xs">March 13, 2023 - May 16, 2025</div>
+              </div>
+              <div>
+                <p>
+                  Developed a full-featured e-commerce platform using React and Node.js, integrating payment gateways
+                  and user authentication.
+                </p>
+              </div>
+            </div>
+            {/* ---2--- */}
+            <div>
+              <div className="text-[#05afc9] text-xl font-black mb-2">Eurosko</div>
+              <div className="flex items-center justify-between w-100 mb-2">
+                <div className="text-l font-bold">Frontend Developer</div>
+                <div className="text-[#6b7280] text-xs">March 13, 2023 - May 16, 2025</div>
+              </div>
+              <div>
+                <p>
+                  Developed a full-featured e-commerce platform using React and Node.js, integrating payment gateways
+                  and user authentication.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
+        {/* Skills */}
       </div>
     </div>
   );
