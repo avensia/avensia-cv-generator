@@ -28,8 +28,6 @@ export const BulletItem = ({ children }: { children: React.ReactNode }) => (
 );
 
 const Skills = ({ skills }: { skills?: string[] }) => {
-  // const items = ['Javascript', 'Typescript', 'React', '.NET', 'Java', 'Action script 2/3'];
-
   return (
     <View style={styles.list}>
       {skills?.map((t: string, i: number) => (

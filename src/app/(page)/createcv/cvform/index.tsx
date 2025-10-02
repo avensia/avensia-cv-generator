@@ -4,22 +4,24 @@ import { ObjectId } from 'mongodb';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { CvWithId, useCv } from '../useCv';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 // ^ adjust the import path
 
 export default function CVFormPage({ form }: { form: CvWithId }) {
   return (
     <main className="min-h-screen w-full bg-gray-50 py-10">
       <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold tracking-tight mb-6">CV Form (Repeatable Sections)</h1>
+        <h1 className="text-2xl font-semibold tracking-tight mb-6">Avensia CV Form</h1>
         <CVForm initialData={form} />
       </div>
     </main>
   );
 }
 
-const blankWork = (): WorkExperience => ({ title: '', company: '', date: '' });
+//const blankWork = (): WorkExperience => ({ title: '', company: '', date: '' });
 const blankEdu = (): Education => ({ degree: '', institution: '', date: '' });
-const blankProj = (): Project => ({ title: '', company: '', date: '', projectDetails: '' });
+const blankProj = (): Project => ({ title: '', date: '', projectDetails: '' });
 
 function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () => void; addLabel?: string }) {
   return (
@@ -50,6 +52,10 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
   // 🔗 Hook: give it your server-provided initial data so there’s no flash
   const { saveCv } = useCv({ initialData });
 
+  // below your other useState hooks
+  const [imgPreviewUrl, setImgPreviewUrl] = useState<string | null>(null);
+  const [imgFile, setImgFile] = useState<File | null>(null);
+
   const [form, setForm] = useState<CvData>(initialData);
   const [cvId, setCvId] = useState<string>(initialData._id?.toString() ?? '');
 
@@ -58,22 +64,42 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
     if (initialData?._id) setCvId(initialData._id.toString());
   }, [initialData?._id]);
 
+  useEffect(() => {
+    return () => {
+      if (imgPreviewUrl) URL.revokeObjectURL(imgPreviewUrl);
+    };
+  }, [imgPreviewUrl]);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleChange = (field: keyof CvData, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 
-  const updateArrayItem = <T,>(key: keyof CvData, idx: number, patch: Partial<T>) => {
+  const updateArrayItem = <T,>(key: keyof CvData, idx: number, patch: T) => {
     setForm(prev => {
       const next = structuredClone(prev) as CvData;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      next[key][idx] = { ...next[key][idx], ...patch };
+
+      if (typeof next[key][idx] === 'string') {
+        // Replace string directly
+        (next[key] as unknown as string[])[idx] = patch as unknown as string;
+      } else {
+        // Merge object
+        (next[key] as T[])[idx] = { ...next[key][idx], ...patch };
+      }
+
       return next;
     });
   };
 
-  const addArrayItem = <T,>(key: keyof CvData, factory: () => T) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setForm(prev => ({ ...prev, [key]: [...(prev[key] as any[]), factory()] } as CvData));
+  // Add one item to an array field on CvData.
+  // If the key doesn't exist yet, it will be created as an array with the new item.
+  const addArrayItem = <K extends keyof CvData>(key: K, factory: () => CvData[K] extends (infer U)[] ? U : never) => {
+    setForm(prev => {
+      const current = prev[key] as unknown as unknown[];
+      const safe = Array.isArray(current) ? current : []; // create if missing/invalid
+      return {
+        ...prev,
+        [key]: [...safe, factory()] as unknown as CvData[K],
+      };
+    });
   };
 
   const removeArrayItem = (key: keyof CvData, idx: number) => {
@@ -85,23 +111,51 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
     });
   };
 
-  const addTechnology = () => addArrayItem<string>('technologies', () => '');
+  const addTechnology = () => addArrayItem('technologies', () => '');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateTechnology = (idx: number, value: string) => updateArrayItem<string>('technologies', idx, value as any);
   const removeTechnology = (idx: number) => removeArrayItem('technologies', idx);
 
+  const addCertificates = () => addArrayItem('certificates', () => '');
+  const updateCertificates = (idx: number, value: string) => updateArrayItem<string>('certificates', idx, value);
+  const removeCertificates = (idx: number) => removeArrayItem('certificates', idx);
+
   const onUploadImage = (file: File | null) => {
-    if (!file) return handleChange('imgDataUrl', '');
-    const reader = new FileReader();
-    reader.onload = () => handleChange('imgDataUrl', reader.result as string);
-    reader.readAsDataURL(file);
+    if (!file) {
+      setImgFile(null);
+      if (imgPreviewUrl) URL.revokeObjectURL(imgPreviewUrl);
+      setImgPreviewUrl(null);
+      handleChange('imgDataUrl', ''); // clear persisted URL
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    if (imgPreviewUrl) URL.revokeObjectURL(imgPreviewUrl);
+
+    setImgFile(file);
+    setImgPreviewUrl(url);
   };
 
-  // 🧠 SUBMIT — use the hook’s unified create/update
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      const { id } = await saveCv(form); // <-- the hook decides create vs update
+      let imgUrl = form.imgDataUrl;
+
+      // only upload if user selected a new file
+      if (imgFile) {
+        const body = new FormData();
+        body.append('file', imgFile);
+
+        const res = await fetch('/api/upload', { method: 'POST', body });
+        if (!res.ok) throw new Error('Image upload failed');
+        const data = await res.json();
+        imgUrl = data.url;
+      }
+
+      const payload = { ...form, imgDataUrl: imgUrl };
+      const { id } = await saveCv(payload);
+
       if (!cvId) setCvId(id);
       alert(cvId ? `Updated CV ${id}` : `Created CV ${id}`);
     } catch (err) {
@@ -115,6 +169,41 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
       {/* Basic Info */}
       <input type="hidden" name="id" value={cvId} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+          <div className="space-y-3">
+            <label className="block text-sm font-medium">Photo</label>
+            <div className="flex items-start gap-4">
+              {form.imgDataUrl ? (
+                <Image
+                  src={imgPreviewUrl ?? form.imgDataUrl!}
+                  width={1000}
+                  height={1000}
+                  alt="Profile"
+                  className="h-24 w-24 rounded-xl object-cover border"
+                />
+              ) : (
+                <div className="h-24 w-24 rounded-xl border bg-gray-100" />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => onUploadImage(e.currentTarget.files?.[0] ?? null)}
+                className="flex-0 w-50  rounded-xl border px-3 py-2"
+              />
+            </div>
+          </div>
+
+          {/* About */}
+          <div>
+            <label className="block text-sm font-medium">About</label>
+            <textarea
+              value={form.about}
+              onChange={e => handleChange('about', e.target.value)}
+              className="w-full rounded-xl border px-3 py-2"
+              rows={8}
+            />
+          </div>
+        </div>
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium">Full Name</label>
@@ -162,37 +251,10 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
             />
           </div>
         </div>
-        <div className="space-y-3">
-          <label className="block text-sm font-medium">Photo</label>
-          <div className="flex items-start gap-4">
-            {form.imgDataUrl ? (
-              <Image src={form.imgDataUrl} alt="Profile" className="h-24 w-24 rounded-xl object-cover border" />
-            ) : (
-              <div className="h-24 w-24 rounded-xl border bg-gray-100" />
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={e => onUploadImage(e.currentTarget.files?.[0] ?? null)}
-              className="flex-1 rounded-xl border px-3 py-2"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* About */}
-      <div>
-        <label className="block text-sm font-medium">About</label>
-        <textarea
-          value={form.about}
-          onChange={e => handleChange('about', e.target.value)}
-          className="w-full rounded-xl border px-3 py-2"
-          rows={4}
-        />
       </div>
 
       {/* Work Experience */}
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <SectionHeader
           title="Work Experience"
           onAdd={() => addArrayItem('workExperience', blankWork)}
@@ -212,21 +274,62 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
                 className="rounded-xl border px-3 py-2"
                 placeholder="Title"
                 value={we.title}
-                onChange={e => updateArrayItem<WorkExperience>('workExperience', i, { title: e.target.value })}
+                onChange={e => updateArrayItem('workExperience', i, { title: e.target.value })}
               />
               <input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Company"
                 value={we.company}
-                onChange={e => updateArrayItem<WorkExperience>('workExperience', i, { company: e.target.value })}
+                onChange={e => updateArrayItem('workExperience', i, { company: e.target.value })}
               />
               <input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Date"
                 value={we.date}
-                onChange={e => updateArrayItem<WorkExperience>('workExperience', i, { date: e.target.value })}
+                onChange={e => updateArrayItem('workExperience', i, { date: e.target.value })}
               />
             </div>
+          </div>
+        ))}
+      </div> */}
+
+      {/* Projects */}
+      <div className="space-y-3">
+        <SectionHeader
+          title="Avensia Projects"
+          onAdd={() => addArrayItem('projects', blankProj)}
+          addLabel="Add Project"
+        />
+        {form.projects.length === 0 && (
+          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Project&quot; to create one.</p>
+        )}
+        {form.projects.map((pr, i) => (
+          <div key={`pr-${i}`} className="space-y-2 rounded-2xl border p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">Project #{i + 1}</p>
+              <RemoveButton onClick={() => removeArrayItem('projects', i)} />
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <input
+                className="rounded-xl border px-3 py-2"
+                placeholder="Title"
+                value={pr.title}
+                onChange={e => updateArrayItem('projects', i, { title: e.target.value })}
+              />
+              <input
+                className="rounded-xl border px-3 py-2"
+                placeholder="Date"
+                value={pr.date}
+                onChange={e => updateArrayItem('projects', i, { date: e.target.value })}
+              />
+            </div>
+            <textarea
+              className="w-full rounded-xl border px-3 py-2"
+              placeholder="Project details"
+              rows={3}
+              value={pr.projectDetails}
+              onChange={e => updateArrayItem('projects', i, { projectDetails: e.target.value })}
+            />
           </div>
         ))}
       </div>
@@ -248,71 +351,28 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
                 className="rounded-xl border px-3 py-2"
                 placeholder="Degree"
                 value={ed.degree}
-                onChange={e => updateArrayItem<Education>('education', i, { degree: e.target.value })}
+                onChange={e => updateArrayItem('education', i, { degree: e.target.value })}
               />
               <input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Institution"
                 value={ed.institution}
-                onChange={e => updateArrayItem<Education>('education', i, { institution: e.target.value })}
+                onChange={e => updateArrayItem('education', i, { institution: e.target.value })}
               />
               <input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Date"
                 value={ed.date}
-                onChange={e => updateArrayItem<Education>('education', i, { date: e.target.value })}
+                onChange={e => updateArrayItem('education', i, { date: e.target.value })}
               />
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Projects */}
-      <div className="space-y-3">
-        <SectionHeader title="Projects" onAdd={() => addArrayItem('projects', blankProj)} addLabel="Add Project" />
-        {form.projects.length === 0 && (
-          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Project&quot; to create one.</p>
-        )}
-        {form.projects.map((pr, i) => (
-          <div key={`pr-${i}`} className="space-y-2 rounded-2xl border p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Project #{i + 1}</p>
-              <RemoveButton onClick={() => removeArrayItem('projects', i)} />
-            </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Title"
-                value={pr.title}
-                onChange={e => updateArrayItem<Project>('projects', i, { title: e.target.value })}
-              />
-              <input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Company"
-                value={pr.company}
-                onChange={e => updateArrayItem<Project>('projects', i, { company: e.target.value })}
-              />
-              <input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Date"
-                value={pr.date}
-                onChange={e => updateArrayItem<Project>('projects', i, { date: e.target.value })}
-              />
-            </div>
-            <textarea
-              className="w-full rounded-xl border px-3 py-2"
-              placeholder="Project details"
-              rows={3}
-              value={pr.projectDetails}
-              onChange={e => updateArrayItem<Project>('projects', i, { projectDetails: e.target.value })}
-            />
           </div>
         ))}
       </div>
 
       {/* Technologies */}
       <div className="space-y-3">
-        <SectionHeader title="Technologies" onAdd={addTechnology} addLabel="Add Technology" />
+        <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Technology" />
         {form.technologies.length === 0 && (
           <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Technology&quot; to create one.</p>
         )}
@@ -330,13 +390,35 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
           ))}
         </div>
       </div>
-
-      <button
-        type="submit"
-        className="w-full rounded-2xl border bg-gray-900 px-4 py-3 text-white shadow-sm hover:bg-gray-800"
-      >
-        {cvId ? 'Update CV' : 'Save CV'}
-      </button>
+      {/* Certificates */}
+      <div className="space-y-3">
+        <SectionHeader title="Certificates" onAdd={addCertificates} addLabel="Add Certificates" />
+        {form.technologies.length === 0 && (
+          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Certificates&quot; to create one.</p>
+        )}
+        <div className="space-y-2">
+          {form?.certificates?.map((cert, i) => (
+            <div key={`cert-${i}`} className="flex items-center gap-3">
+              <input
+                className="flex-1 rounded-xl border px-3 py-2"
+                placeholder={`Certificates #${i + 1}`}
+                value={cert}
+                onChange={e => updateCertificates(i, e.target.value)}
+              />
+              <RemoveButton onClick={() => removeCertificates(i)} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex">
+        <Button
+          type="submit"
+          className="w-full rounded-2xl border bg-gray-900 px-4 py-3 text-white shadow-sm hover:bg-gray-800"
+        >
+          {cvId ? 'Update CV' : 'Save CV'}
+        </Button>
+        <Link href="/previewcv">Preview PDF</Link>
+      </div>
     </form>
   );
 }

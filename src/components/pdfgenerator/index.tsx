@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { Document, Page, StyleSheet, View, Font } from '@react-pdf/renderer';
 import { Heading } from './heading';
@@ -52,7 +50,6 @@ const styles = StyleSheet.create({
 });
 
 export const CreatePDF = ({ formData }: { formData?: CvData }) => {
-  console.log({ formData });
   return (
     <Document>
       <Page style={styles.page} orientation={'portrait'}>
@@ -75,7 +72,7 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
             <Skills skills={formData?.technologies} />
           </Section>
           <Section title="Certificates" hr={false} wrap={false}>
-            <Certificates />
+            <Certificates certs={formData?.certificates} />
           </Section>
           <Section title="Educations" hr={false}>
             <Education educations={formData?.education} />
