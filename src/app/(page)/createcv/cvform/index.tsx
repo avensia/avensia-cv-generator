@@ -1,18 +1,36 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import { ObjectId } from 'mongodb';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
 import { CvWithId, useCv } from '../useCv';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-// ^ adjust the import path
+import { useRouter } from 'next/navigation';
+import { logout } from '@/app/lib/auth';
 
 export default function CVFormPage({ form }: { form: CvWithId }) {
+  const router = useRouter();
+
+  const handleGeneratePDF = () => {
+    router.push('/previewcv', undefined);
+  };
+
   return (
     <main className="min-h-screen w-full bg-gray-50 py-10">
-      <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold tracking-tight mb-6">Avensia CV Form</h1>
+      <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="flex justify-between w-full">
+          <h1 className="text-2xl font-semibold tracking-tight mb-6">Avensia CV Form</h1>
+          <div className="flex justify-end w-full gap-5">
+            <Button onClick={handleGeneratePDF} className="w-50">
+              Generate PDF
+            </Button>
+            <form action={logout}>
+              <Button className="mb-5" type="submit">
+                Logout
+              </Button>
+            </form>
+          </div>
+        </div>
         <CVForm initialData={form} />
       </div>
     </main>
@@ -51,11 +69,9 @@ function RemoveButton({ onClick }: { onClick: () => void }) {
 function CVForm({ initialData }: { initialData: CvData & { _id?: string | ObjectId } }) {
   // 🔗 Hook: give it your server-provided initial data so there’s no flash
   const { saveCv } = useCv({ initialData });
-
   // below your other useState hooks
   const [imgPreviewUrl, setImgPreviewUrl] = useState<string | null>(null);
   const [imgFile, setImgFile] = useState<File | null>(null);
-
   const [form, setForm] = useState<CvData>(initialData);
   const [cvId, setCvId] = useState<string>(initialData._id?.toString() ?? '');
 
@@ -170,7 +186,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
       <input type="hidden" name="id" value={cvId} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <div className="space-y-3">
+          <div className="space-y-3 mb-5">
             <label className="block text-sm font-medium">Photo</label>
             <div className="flex items-start gap-4">
               {form.imgDataUrl ? (
@@ -410,14 +426,10 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
           ))}
         </div>
       </div>
-      <div className="flex">
-        <Button
-          type="submit"
-          className="w-full rounded-2xl border bg-gray-900 px-4 py-3 text-white shadow-sm hover:bg-gray-800"
-        >
+      <div className="flex justify-center">
+        <Button type="submit" className="w-1/2  px-4 py-3  shadow-sm">
           {cvId ? 'Update CV' : 'Save CV'}
         </Button>
-        <Link href="/previewcv">Preview PDF</Link>
       </div>
     </form>
   );

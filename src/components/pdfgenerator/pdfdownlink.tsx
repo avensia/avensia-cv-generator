@@ -3,6 +3,7 @@
 import React from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { CreatePDF } from '.';
+import { Button } from '../ui/button';
 
 type PropsType = {
   cvData?: CvData;
@@ -16,7 +17,7 @@ const Pdfdownlink = (props: PropsType) => {
         fileName={`${props.cvData?.fullName}Avensia-CV.pdf`}
         style={{ textDecoration: 'none', color: 'blue' }}
       >
-        {({ loading }) => (loading ? 'Generating PDF...' : 'Download PDF')}
+        {({ loading }) => <Button>{loading ? 'Generating PDF...' : 'Download PDF'}</Button>}
       </PDFDownloadLink>
     </div>
   );
