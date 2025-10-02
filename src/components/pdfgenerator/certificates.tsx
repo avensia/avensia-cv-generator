@@ -6,8 +6,8 @@ const styles = StyleSheet.create({
   list: { marginTop: 4 },
 });
 
-const Certificates = () => {
-  const items = ['Commercetools', 'Optimizely'];
+const Certificates = ({ certs }: { certs?: string[] }) => {
+  const items = certs as string[];
 
   return (
     <View style={styles.list}>
