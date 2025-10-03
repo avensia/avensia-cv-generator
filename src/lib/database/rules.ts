@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const RegisterFormSchema = z
   .object({
-    email: z.string().email('Invalid email address').trim(),
+    email: z.string().email('Invalid email address').min(1, { message: ' email is required.' }).trim(),
     password: z.string().trim(),
     confirmPassword: z.string().trim(),
   })
@@ -17,6 +17,6 @@ export const RegisterFormSchema = z
   });
 
 export const LoginFormSchema = z.object({
-  email: z.string().email('Invalid email address').min(1, { message: 'email is required.' }).trim(),
+  email: z.string().email('Invalid email address').min(1, { message: ' email is required.' }).trim(),
   password: z.string().min(1, { message: 'password is required.' }).trim(),
 });

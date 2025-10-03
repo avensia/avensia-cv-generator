@@ -7,6 +7,10 @@ import { CvWithId, useCv } from '../useCv';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { logout } from '@/app/lib/auth';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 
 export default function CVFormPage({ form }: { form: CvWithId }) {
   const router = useRouter();
@@ -16,24 +20,24 @@ export default function CVFormPage({ form }: { form: CvWithId }) {
   };
 
   return (
-    <main className="min-h-screen w-full bg-gray-50 py-10">
-      <div className="rounded-2xl bg-white p-6 shadow-sm">
-        <div className="flex justify-between w-full">
-          <h1 className="text-2xl font-semibold tracking-tight mb-6">Avensia CV Form</h1>
-          <div className="flex justify-end w-full gap-5">
-            <Button onClick={handleGeneratePDF} className="w-50">
-              Generate PDF
+    <div>
+      <div className="flex justify-between w-full">
+        <h1 className="text-2xl font-bold w-full  mb-6">Avensia CV Form</h1>
+        <div className="flex justify-end w-full gap-5">
+          <Button onClick={handleGeneratePDF} className="w-50">
+            Generate PDF
+          </Button>
+          <form action={logout}>
+            <Button className="mb-5" type="submit">
+              Logout
             </Button>
-            <form action={logout}>
-              <Button className="mb-5" type="submit">
-                Logout
-              </Button>
-            </form>
-          </div>
+          </form>
         </div>
+      </div>
+      <div className="border border-gray-200 rounded-md p-5 shadow-2xl">
         <CVForm initialData={form} />
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -46,9 +50,9 @@ function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () =
     <div className="flex items-center justify-between">
       <h2 className="text-lg font-semibold">{title}</h2>
       {onAdd && (
-        <button type="button" onClick={onAdd} className="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">
+        <Button type="button" onClick={onAdd} className="px-3 py-1.5 text-sm">
           + {addLabel ?? 'Add'}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -56,13 +60,13 @@ function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () =
 
 function RemoveButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs text-red-700 hover:bg-red-100"
     >
       Remove
-    </button>
+    </Button>
   );
 }
 
@@ -183,11 +187,11 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Basic Info */}
-      <input type="hidden" name="id" value={cvId} />
+      <Input type="hidden" name="id" value={cvId} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <div className="space-y-3 mb-5">
-            <label className="block text-sm font-medium">Photo</label>
+            <Label htmlFor="profile">Photo</Label>
             <div className="flex items-start gap-4">
               {form.imgDataUrl ? (
                 <Image
@@ -200,19 +204,19 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
               ) : (
                 <div className="h-24 w-24 rounded-xl border bg-gray-100" />
               )}
-              <input
+              <Input
+                id="profile"
                 type="file"
                 accept="image/*"
                 onChange={e => onUploadImage(e.currentTarget.files?.[0] ?? null)}
-                className="flex-0 w-50  rounded-xl border px-3 py-2"
               />
             </div>
           </div>
 
           {/* About */}
           <div>
-            <label className="block text-sm font-medium">About</label>
-            <textarea
+            <Label className="block text-sm font-medium">About</Label>
+            <Textarea
               value={form.about}
               onChange={e => handleChange('about', e.target.value)}
               className="w-full rounded-xl border px-3 py-2"
@@ -222,93 +226,28 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         </div>
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium">Full Name</label>
-            <input
-              type="text"
-              value={form.fullName}
-              onChange={e => handleChange('fullName', e.target.value)}
-              className="w-full rounded-xl border px-3 py-2"
-            />
+            <Label className="block text-sm font-medium">Full Name</Label>
+            <Input type="text" value={form.fullName} onChange={e => handleChange('fullName', e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium">Position</label>
-            <input
-              type="text"
-              value={form.position}
-              onChange={e => handleChange('position', e.target.value)}
-              className="w-full rounded-xl border px-3 py-2"
-            />
+            <Label className="block text-sm font-medium">Position</Label>
+            <Input type="text" value={form.position} onChange={e => handleChange('position', e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              value={form.email}
-              onChange={e => handleChange('email', e.target.value)}
-              className="w-full rounded-xl border px-3 py-2"
-            />
+            <Label className="block text-sm font-medium">Email</Label>
+            <Input type="email" value={form.email} onChange={e => handleChange('email', e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium">LinkedIn</label>
-            <input
-              type="url"
-              value={form.linkedIn}
-              onChange={e => handleChange('linkedIn', e.target.value)}
-              className="w-full rounded-xl border px-3 py-2"
-            />
+            <Label className="block text-sm font-medium">LinkedIn</Label>
+            <Input type="url" value={form.linkedIn} onChange={e => handleChange('linkedIn', e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium">Phone</label>
-            <input
-              type="tel"
-              value={form.phone}
-              onChange={e => handleChange('phone', e.target.value)}
-              className="w-full rounded-xl border px-3 py-2"
-            />
+            <Label className="block text-sm font-medium">Phone</Label>
+            <Input type="tel" value={form.phone} onChange={e => handleChange('phone', e.target.value)} />
           </div>
         </div>
       </div>
-
-      {/* Work Experience */}
-      {/* <div className="space-y-3">
-        <SectionHeader
-          title="Work Experience"
-          onAdd={() => addArrayItem('workExperience', blankWork)}
-          addLabel="Add Role"
-        />
-        {form.workExperience.length === 0 && (
-          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Role&quot; to create one.</p>
-        )}
-        {form.workExperience.map((we, i) => (
-          <div key={`we-${i}`} className="space-y-2 rounded-2xl border p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Role #{i + 1}</p>
-              <RemoveButton onClick={() => removeArrayItem('workExperience', i)} />
-            </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Title"
-                value={we.title}
-                onChange={e => updateArrayItem('workExperience', i, { title: e.target.value })}
-              />
-              <input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Company"
-                value={we.company}
-                onChange={e => updateArrayItem('workExperience', i, { company: e.target.value })}
-              />
-              <input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Date"
-                value={we.date}
-                onChange={e => updateArrayItem('workExperience', i, { date: e.target.value })}
-              />
-            </div>
-          </div>
-        ))}
-      </div> */}
-
+      <Separator />
       {/* Projects */}
       <div className="space-y-3">
         <SectionHeader
@@ -326,20 +265,20 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
               <RemoveButton onClick={() => removeArrayItem('projects', i)} />
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <input
+              <Input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Title"
                 value={pr.title}
                 onChange={e => updateArrayItem('projects', i, { title: e.target.value })}
               />
-              <input
+              <Input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Date"
                 value={pr.date}
                 onChange={e => updateArrayItem('projects', i, { date: e.target.value })}
               />
             </div>
-            <textarea
+            <Textarea
               className="w-full rounded-xl border px-3 py-2"
               placeholder="Project details"
               rows={3}
@@ -349,7 +288,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
           </div>
         ))}
       </div>
-
+      <Separator />
       {/* Education */}
       <div className="space-y-3">
         <SectionHeader title="Education" onAdd={() => addArrayItem('education', blankEdu)} addLabel="Add Education" />
@@ -363,19 +302,19 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
               <RemoveButton onClick={() => removeArrayItem('education', i)} />
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <input
+              <Input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Degree"
                 value={ed.degree}
                 onChange={e => updateArrayItem('education', i, { degree: e.target.value })}
               />
-              <input
+              <Input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Institution"
                 value={ed.institution}
                 onChange={e => updateArrayItem('education', i, { institution: e.target.value })}
               />
-              <input
+              <Input
                 className="rounded-xl border px-3 py-2"
                 placeholder="Date"
                 value={ed.date}
@@ -385,7 +324,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
           </div>
         ))}
       </div>
-
+      <Separator />
       {/* Technologies */}
       <div className="space-y-3">
         <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Technology" />
@@ -395,7 +334,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         <div className="space-y-2">
           {form.technologies.map((tech, i) => (
             <div key={`tech-${i}`} className="flex items-center gap-3">
-              <input
+              <Input
                 className="flex-1 rounded-xl border px-3 py-2"
                 placeholder={`Technology #${i + 1}`}
                 value={tech}
@@ -415,7 +354,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         <div className="space-y-2">
           {form?.certificates?.map((cert, i) => (
             <div key={`cert-${i}`} className="flex items-center gap-3">
-              <input
+              <Input
                 className="flex-1 rounded-xl border px-3 py-2"
                 placeholder={`Certificates #${i + 1}`}
                 value={cert}
