@@ -3,7 +3,7 @@ import { decrypt } from '@/lib/database/session';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const protectedRoutes = ['/createcv'];
+const protectedRoutes = ['/createcv/', '/previewcv/'];
 const publicRoutes = ['/login', '/register'];
 
 export async function middleware(req: NextRequest) {
