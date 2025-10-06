@@ -39,7 +39,7 @@ const Register = () => {
             <Label className="mb-2" htmlFor="confirmpassword">
               Confirm Password
             </Label>
-            <Input id="confirmpassword" type="password" name="confirmpassword" placeholder="Confirm Password" />
+            <Input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm Password" />
           </div>
           <div className="mb-5">
             {state?.errors?.email && <p className="text-red-600">{state.errors.email}</p>}
