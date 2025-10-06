@@ -24,7 +24,7 @@ export default function CVFormPage({ form }: { form: CvWithId }) {
       <div className="flex justify-between w-full">
         <h1 className="text-2xl font-bold w-full  mb-6">Avensia CV Form</h1>
         <div className="flex justify-end w-full gap-5">
-          <Button onClick={handleGeneratePDF} className="w-50">
+          <Button onClick={handleGeneratePDF} className="w-50" disabled={!form._id}>
             Generate PDF
           </Button>
           <form action={logout}>
@@ -156,6 +156,8 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
     setImgPreviewUrl(url);
   };
 
+  console.log({ imgFile, imgPreviewUrl });
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -167,7 +169,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         const body = new FormData();
         body.append('file', imgFile);
 
-        const res = await fetch('/api/upload', { method: 'POST', body });
+        const res = await fetch('/api/blob-upload', { method: 'POST', body });
         if (!res.ok) throw new Error('Image upload failed');
         const data = await res.json();
         imgUrl = data.url;
@@ -195,14 +197,20 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
             <div className="flex items-start gap-4">
               {form.imgDataUrl ? (
                 <Image
-                  src={imgPreviewUrl ?? form.imgDataUrl!}
+                  src={imgPreviewUrl ?? form.imgDataUrl}
                   width={1000}
                   height={1000}
                   alt="Profile"
-                  className="h-24 w-24 rounded-xl object-cover border"
+                  className="h-24 w-24 rounded-xl border bg-gray-300"
                 />
               ) : (
-                <div className="h-24 w-24 rounded-xl border bg-gray-100" />
+                <Image
+                  src={imgPreviewUrl ?? '/assets/images/avensia-logo-light.jpg'}
+                  width={1000}
+                  height={1000}
+                  alt="Profile"
+                  className="h-24 w-24 rounded-xl border bg-gray-300"
+                />
               )}
               <Input
                 id="profile"
@@ -327,16 +335,16 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
       <Separator />
       {/* Technologies */}
       <div className="space-y-3">
-        <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Technology" />
+        <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Skillset" />
         {form.technologies.length === 0 && (
-          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Technology&quot; to create one.</p>
+          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Skillset&quot; to create one.</p>
         )}
         <div className="space-y-2">
           {form.technologies.map((tech, i) => (
             <div key={`tech-${i}`} className="flex items-center gap-3">
               <Input
                 className="flex-1 rounded-xl border px-3 py-2"
-                placeholder={`Technology #${i + 1}`}
+                placeholder={`Skill #${i + 1}`}
                 value={tech}
                 onChange={e => updateTechnology(i, e.target.value)}
               />

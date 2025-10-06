@@ -10,7 +10,7 @@ import Certificates from './certificates';
 import Education from './education';
 
 const coverUrl = '/assets/images/CoverPhoto-crop.jpg';
-const samplePFUrl = '/assets/images/sample-pf.jpg';
+const samplePFUrl = '/assets/images/avensia-logo-light.jpg';
 
 Font.register({
   family: 'Poppins',
