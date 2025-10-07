@@ -1,5 +1,4 @@
 // ---------------- Types ----------------
-type WorkExperience = { title: string; company: string; date: string };
 type Education = { degree: string; institution: string; date: string };
 
 type CvData = {
