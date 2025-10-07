@@ -8,6 +8,7 @@ import WorkExperience from './workexperience';
 import Skills from './skills';
 import Certificates from './certificates';
 import Education from './education';
+import { isValueValid } from '@/app/lib/utils/validations';
 
 const coverUrl = '/assets/images/CoverPhoto-crop.jpg';
 const samplePFUrl = '/assets/images/avensia-logo-light.jpg';
@@ -62,21 +63,31 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
         </View>
         <View style={styles.layout}>
           <Name formData={formData} />
-          <Section title="About" hr={false} wrap={false}>
-            <About aboutMe={formData?.about} />
-          </Section>
-          <Section title="Work Experience" hr={false} wrap={false}>
-            <WorkExperience projects={formData?.projects} />
-          </Section>
-          <Section title="Skills" hr={false} wrap={false}>
-            <Skills skills={formData?.technologies} />
-          </Section>
-          <Section title="Certificates" hr={false} wrap={false}>
-            <Certificates certs={formData?.certificates} />
-          </Section>
-          <Section title="Educations" hr={false}>
-            <Education educations={formData?.education} />
-          </Section>
+          {isValueValid(formData?.about) && (
+            <Section title="About" hr={false} wrap={false}>
+              <About aboutMe={formData?.about} />
+            </Section>
+          )}
+          {isValueValid(formData?.projects) && (
+            <Section title="Work Experience" hr={false} wrap={false}>
+              <WorkExperience projects={formData?.projects} />
+            </Section>
+          )}
+          {isValueValid(formData?.technologies) && (
+            <Section title="Skills" hr={false} wrap={false}>
+              <Skills skills={formData?.technologies} />
+            </Section>
+          )}
+          {isValueValid(formData?.certificates) && (
+            <Section title="Certificates" hr={false} wrap={false}>
+              <Certificates certs={formData?.certificates} />
+            </Section>
+          )}
+          {isValueValid(formData?.education) && (
+            <Section title="Educations" hr={false}>
+              <Education educations={formData?.education} />
+            </Section>
+          )}
         </View>
       </Page>
     </Document>
