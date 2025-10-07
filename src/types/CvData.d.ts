@@ -1,5 +1,4 @@
 // ---------------- Types ----------------
-type Education = { degree: string; institution: string; date: string };
 
 type CvData = {
   fullName: string;
