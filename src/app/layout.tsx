@@ -1,19 +1,16 @@
 import type { Metadata } from 'next';
-import { Nunito, Nunito_Sans } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 import { getServerSession } from 'next-auth';
 import { ThemeProvider } from 'next-themes';
 import GlobalHeader from '@/components/header';
 import SessionProviderClient from './components/SessionProviderClient';
+import 'react-image-crop/dist/ReactCrop.css';
 
-const getNunitoSans = Nunito_Sans({
-  variable: '--font-nunito-sans',
+const poppins = Poppins({
   subsets: ['latin'],
-});
-
-const getNunito = Nunito({
-  variable: '--font-nunito',
-  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'], // choose the weights you need
+  variable: '--font-poppins', // optional for Tailwind
 });
 
 export const metadata: Metadata = {
@@ -29,7 +26,7 @@ export default async function RootLayout({
   const session = await getServerSession();
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${getNunito.variable} ${getNunitoSans.variable} antialiased font-nunito-sans font-nunito `}>
+      <body className={`${poppins.className} antialiased font-nunito-sans font-nunito `}>
         <SessionProviderClient session={session}>
           <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" disableTransitionOnChange>
             <main>

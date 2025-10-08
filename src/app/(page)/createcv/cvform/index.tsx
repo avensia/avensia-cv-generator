@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { ObjectId } from 'mongodb';
-import Image from 'next/image';
 import { CvWithId, useCv } from '../useCv';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -11,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
+import ProfilePicture from './components/profilepicture';
 
 export default function CVFormPage({ form }: { form: CvWithId }) {
   const router = useRouter();
@@ -21,20 +21,20 @@ export default function CVFormPage({ form }: { form: CvWithId }) {
 
   return (
     <div>
-      <div className="flex justify-between w-full">
-        <h1 className="text-2xl font-bold w-full  mb-6">Avensia CV Form</h1>
-        <div className="flex justify-end w-full gap-5">
-          <Button onClick={handleGeneratePDF} className="w-50" disabled={!form._id}>
-            Generate PDF
+      <div className="w-full">
+        <h1 className="text-2xl font-bold w-full flext text-center mb-6">Avensia CV Form</h1>
+        <div className="flex justify-start w-full gap-5">
+          <Button variant="secondary" onClick={handleGeneratePDF} className="w-50" disabled={!form._id}>
+            Generate CV as PDF
           </Button>
           <form action={logout}>
-            <Button className="mb-5" type="submit">
+            <Button variant="secondary" className="mb-5" type="submit">
               Logout
             </Button>
           </form>
         </div>
       </div>
-      <div className="border border-gray-200 rounded-md p-5 shadow-2xl">
+      <div className="p-5 shadow-xl/30 inset-shadow-xs">
         <CVForm initialData={form} />
       </div>
     </div>
@@ -51,7 +51,7 @@ function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () =
       <h2 className="text-lg font-semibold">{title}</h2>
       {onAdd && (
         <Button type="button" onClick={onAdd} className="px-3 py-1.5 text-sm">
-          + {addLabel ?? 'Add'}
+          {addLabel ?? 'Add'}
         </Button>
       )}
     </div>
@@ -60,11 +60,7 @@ function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () =
 
 function RemoveButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button
-      type="button"
-      onClick={onClick}
-      className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs text-red-700 hover:bg-red-100"
-    >
+    <Button type="button" variant="outline" onClick={onClick}>
       Remove
     </Button>
   );
@@ -156,8 +152,6 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
     setImgPreviewUrl(url);
   };
 
-  console.log({ imgFile, imgPreviewUrl });
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -192,35 +186,7 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
       <Input type="hidden" name="id" value={cvId} />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <div className="space-y-3 mb-5">
-            <Label htmlFor="profile">Photo</Label>
-            <div className="flex items-start gap-4">
-              {form.imgDataUrl ? (
-                <Image
-                  src={imgPreviewUrl ?? form.imgDataUrl}
-                  width={1000}
-                  height={1000}
-                  alt="Profile"
-                  className="h-24 w-24 rounded-xl border bg-gray-300"
-                />
-              ) : (
-                <Image
-                  src={imgPreviewUrl ?? '/assets/images/avensia-logo-light.jpg'}
-                  width={1000}
-                  height={1000}
-                  alt="Profile"
-                  className="h-24 w-24 rounded-xl border bg-gray-300"
-                />
-              )}
-              <Input
-                id="profile"
-                type="file"
-                accept="image/*"
-                onChange={e => onUploadImage(e.currentTarget.files?.[0] ?? null)}
-              />
-            </div>
-          </div>
-
+          <ProfilePicture form={form} onUploadImage={onUploadImage} />
           {/* About */}
           <div>
             <Label className="block text-sm font-medium">About</Label>
@@ -374,8 +340,8 @@ function CVForm({ initialData }: { initialData: CvData & { _id?: string | Object
         </div>
       </div>
       <div className="flex justify-center">
-        <Button type="submit" className="w-1/2  px-4 py-3  shadow-sm">
-          {cvId ? 'Update CV' : 'Save CV'}
+        <Button type="submit" className="w-1/6  px-4 py-3  shadow-sm">
+          {cvId ? 'Save CV' : 'Save CV'}
         </Button>
       </div>
     </form>

@@ -1,3 +1,4 @@
+import { isValueValid } from '@/app/lib/utils/validations';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 
 const LH = 1.4;
@@ -41,9 +42,12 @@ export default function Education({ educations }: CVFormEducationData) {
     <View style={styles.section}>
       {educations &&
         educations.length > 0 &&
-        educations.map((edu, index) => (
-          <EducationItem key={`${edu}-${index}`} school={edu.institution} dates={edu.date} subtitle={edu.degree} />
-        ))}
+        educations.map((edu, index) => {
+          if (!isValueValid(edu)) return;
+          return (
+            <EducationItem key={`${edu}-${index}`} school={edu.institution} dates={edu.date} subtitle={edu.degree} />
+          );
+        })}
     </View>
   );
 }
