@@ -42,8 +42,8 @@ export default function CVFormPage({ form }: { form: CvWithId }) {
 }
 
 //const blankWork = (): WorkExperience => ({ title: '', company: '', date: '' });
-const blankEdu = (): Education => ({ degree: '', institution: '', date: '' });
-const blankProj = (): Project => ({ title: '', date: '', projectDetails: '' });
+const blankEdu = (): Education => ({user_id:'', degree: '', institution: '', date: '' });
+const blankProj = (): Project => ({user_id: '', title: '', date: '', details:'', projectDetails: '', company: '', role:'', responsibilities:'' });
 
 function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () => void; addLabel?: string }) {
   return (

@@ -2,8 +2,8 @@ import { getCollection } from '@/lib/database/db';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  const {user_id} = req.query;
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const user_id = params.id;
   
   const payload = (await req.json()) as Education;
   //insert validation here
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
       ...payload,
       createdAt: new Date(),
       updatedAt: new Date(),
-      user_Id: new ObjectId(user_id),
+      user_Id: new ObjectId(user_id)
     });
     return NextResponse.json({ id: insertedId.toString() }, { status: 201 });
   }
