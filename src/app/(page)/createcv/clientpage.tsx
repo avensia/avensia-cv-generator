@@ -27,7 +27,7 @@ const CreateCvClient = () => {
   return (
     <PageCenter>
       <>
-        <CVFormPage form={cv} />
+        <CVFormPage initialForm={cv} />
       </>
     </PageCenter>
   );

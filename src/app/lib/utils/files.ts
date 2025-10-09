@@ -32,12 +32,10 @@ export async function cleanUploadsFolder(): Promise<void> {
 
     // ensure folder still exists (noop if already there)
     await mkdir(uploadsDir, { recursive: true });
-    // console.log('Uploads folder cleaned successfully.');
   } catch (err: unknown) {
     if (isErrno(err) && err.code === 'ENOENT') {
       // Folder doesn't exist — create it so callers can rely on it
       await mkdir(uploadsDir, { recursive: true });
-      // console.log('Uploads folder did not exist. It has been created.');
       return;
     }
     // console.error('Error cleaning uploads folder:', err);
