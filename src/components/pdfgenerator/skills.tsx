@@ -1,3 +1,4 @@
+import { isValueValid } from '@/app/lib/utils/validations';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
@@ -30,9 +31,10 @@ export const BulletItem = ({ children }: { children: React.ReactNode }) => (
 const Skills = ({ skills }: { skills?: string[] }) => {
   return (
     <View style={styles.list}>
-      {skills?.map((t: string, i: number) => (
-        <BulletItem key={i}>{t}</BulletItem>
-      ))}
+      {skills?.map((t: string, i: number) => {
+        if (!isValueValid(t)) return;
+        return <BulletItem key={i}>{t}</BulletItem>;
+      })}
     </View>
   );
 };
