@@ -1,6 +1,9 @@
 // type WorkExperienceReq = { title: string; company: string; date: string };
 // type Education = { degree: string; institution: string; date: string };
 // type Project = { title: string; date: string; projectDetails: string };
+type WorkExperience = { title: string; company: string; date: string };
+type Education = { degree: string; institution: string; date: string };
+type Project = { title: string; date: string; projectDetails: string };
 // ---------------- Types ----------------
 
 type CvCreateFormRequest = {
