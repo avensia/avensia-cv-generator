@@ -2,14 +2,14 @@ import { getCollection } from '@/lib/database/db';
 import { ObjectId } from 'mongodb';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  const {user_id} = req.query;
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const user_id = params.id;
   
   const payload = (await req.json()) as Project;
   //insert validation here
 
   try{
-    const col = await getCollection<Project & { createdAt: Date; updatedAt: Date; user_Id: ObjectId }>('projects');
+    const col = await getCollection<WorkExperience & { createdAt: Date; updatedAt: Date; user_Id: ObjectId }>('workexperiences');
     const { insertedId } = await col.insertOne({
       ...payload,
       createdAt: new Date(),
@@ -20,6 +20,6 @@ export async function POST(req: NextRequest) {
   }
   catch (e) {
     console.error(e);
-    return NextResponse.json({ error: 'Failed to create a project entry' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create a work experience entry' }, { status: 500 });
   }
 }
