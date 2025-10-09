@@ -8,8 +8,6 @@ type CvData = {
   linkedIn: string;
   phone: string;
   about: string;
-  education: Education[];
-  projects: Project[];
   technologies: string[];
   certificates: string[];
 };
