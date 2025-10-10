@@ -42,9 +42,7 @@ export const SaveAlert = forwardRef<SaveAlertHandle, SaveAlertProps>((_props, re
           <DialogTitle>Alert</DialogTitle>
           <DialogDescription>
             {isSaveSuccess.status ? (
-              <>
-                {cvId ? `CV Updated Successfully  ${isSaveSuccess.id}` : `CV Created  Successfully ${isSaveSuccess.id}`}
-              </>
+              <>{`CV Successfully Saved  ${isSaveSuccess.id}`}</>
             ) : (
               <>{isSaveSuccess?.errorMessage}</>
             )}
