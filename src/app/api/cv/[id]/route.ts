@@ -14,13 +14,16 @@ export async function POST(req: Request) {
 
   try {
     const payload = (await req.json()) as CvCreateFormRequest;
+
     const { projects, education, workExperience, ...cvData} = payload;
 
+    //acquire collections
     const cvCol = await getCollection<CvData & { createdAt: Date; updatedAt: Date; userId: ObjectId }>('cvs');
     const eduCol = await getCollection<Education & { createdAt: Date; updatedAt: Date; user_id: ObjectId }>('educations');
     const workExCol = await getCollection<WorkExperience &{ createdAt: Date; updatedAt: Date; user_id: ObjectId }>('workexperiences');
     const projCol = await getCollection<Project & { createdAt: Date; updatedAt: Date; user_id: ObjectId }>('projects');
     
+    //create CV document
     const { insertedId } = await cvCol.insertOne({
       ...cvData,
       createdAt: new Date(),
@@ -28,10 +31,11 @@ export async function POST(req: Request) {
       userId: new ObjectId(user.userId),
     });
 
+    //create related documents on affected tables
     await eduCol.insertMany(
         education.map(document => ({
             ...document,
-            userId: new ObjectId(insertedId), // ensure userId is included
+            user_id: new ObjectId(insertedId), // ensure userId is included
             createdAt: new Date(),
             updatedAt: new Date(),
         }))
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
     await projCol.insertMany(
         projects.map(document => ({
             ...document,
-            userId: new ObjectId(insertedId), // ensure userId is included
+            user_id: new ObjectId(insertedId), // ensure userId is included
             createdAt: new Date(),
             updatedAt: new Date(),
         }))
@@ -47,7 +51,7 @@ export async function POST(req: Request) {
     await workExCol.insertMany(
         workExperience.map(document => ({
             ...document,
-            userId: new ObjectId(insertedId), // ensure userId is included
+            user_id: new ObjectId(insertedId), // ensure userId is included
             createdAt: new Date(),
             updatedAt: new Date(),
         }))
@@ -81,7 +85,6 @@ export async function GET(req: Request) {
       if (!doc) {
         return NextResponse.json({ error: 'CV not found or not owned by user' }, { status: 404 });
       }
-      return NextResponse.json(doc, { status: 200 });
     }
 
     // Otherwise: just get the single CV for this user (most recent one if multiple exist)
