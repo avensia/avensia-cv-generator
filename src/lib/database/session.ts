@@ -20,7 +20,7 @@ export async function decrypt(session: string) {
     const { payload } = await jwtVerify(session, encodeKey, { algorithms: [algorithmHMAC] });
     return payload;
   } catch (error) {
-    console.log('Session expired or invalid', error);
+    console.debug('Session expired or invalid', error);
     return null;
   }
 }
