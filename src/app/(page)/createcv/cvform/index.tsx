@@ -39,7 +39,7 @@ export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
     <div>
       <div className="w-full">
         <h1 className="text-2xl font-bold w-full flext text-center mb-6">Avensia CV Form</h1>
-        <SaveAlert cvId={cvId} isSaveSuccess={isSaveSuccess} ref={saveAlertRef} />
+        <SaveAlert isSaveSuccess={isSaveSuccess} ref={saveAlertRef} />
         <div className="flex justify-start w-full gap-5">
           <Button onClick={handleSubmit} type="submit" className="w-1/6  px-4 py-3  shadow-sm">
             Save CV

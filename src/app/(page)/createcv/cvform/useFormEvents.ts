@@ -33,12 +33,10 @@ export function useFormEvents(initialData: CvData & { _id?: string | ObjectId })
       const { id } = await saveCv(payload);
 
       if (!cvId) setCvId(id);
-      //alert(cvId ? `Updated CV ${id}` : `Created CV ${id}`);
       setSaveSuccess({ status: true, id });
     } catch (err) {
       console.error(err);
       setSaveSuccess({ status: false, id: '', errorMessage: err instanceof Error ? err.message : 'Unexpected error' });
-      //alert(err instanceof Error ? err.message : 'Unexpected error');
     }
   };
 

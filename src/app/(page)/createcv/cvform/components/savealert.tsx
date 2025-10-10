@@ -18,11 +18,10 @@ export type SaveAlertHandle = {
 
 type SaveAlertProps = {
   isSaveSuccess: { status: boolean; id: string; errorMessage?: string };
-  cvId: string;
 };
 
 export const SaveAlert = forwardRef<SaveAlertHandle, SaveAlertProps>((_props, ref) => {
-  const { isSaveSuccess, cvId } = _props;
+  const { isSaveSuccess } = _props;
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
