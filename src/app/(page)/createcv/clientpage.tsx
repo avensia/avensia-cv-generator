@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import CVFormPage from './cvform';
 import { useCv } from './useCv';
 import { PageCenter } from '@/components/ui/box';
+import ProfileSkeleton from './cvform/components/ProfileSkeleton';
 
 const CreateCvClient = () => {
   const { cv, refresh, loading } = useCv();
@@ -17,11 +18,7 @@ const CreateCvClient = () => {
   }, []);
 
   if (loading) {
-    return (
-      <PageCenter>
-        <p className="p-6">Loading your CV...</p>
-      </PageCenter>
-    );
+    return <ProfileSkeleton />;
   }
 
   return (

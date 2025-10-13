@@ -4,16 +4,14 @@ const style = StyleSheet.create({
   projectName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#05afc9',
   },
   projectNameContainer: { marginBottom: 10 },
   position: {
     fontWeight: 'bold',
+    marginRight: 8,
   },
   tenureship: {
-    color: '#6b7280',
     fontSize: 8,
-    marginLeft: 8,
   },
   description: { marginTop: 8 },
 });
@@ -33,7 +31,7 @@ const WorkExperience = ({ projects }: CVFormProjectsData) => (
                 alignItems: 'center',
               }}
             >
-              <Text style={style.position}>{project.role}</Text>
+              {project.role && <Text style={style.position}>{project.role}</Text>}
               <View style={style.tenureship}>
                 <Text>{project.date}</Text>
               </View>

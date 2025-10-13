@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     display: 'flex',
     fontSize: 12,
+    color: '#0F2037',
   },
   layout: {
     marginLeft: 36,
@@ -69,7 +70,7 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
             </Section>
           )}
           {isValueValid(formData?.projects) && (
-            <Section title="Work Experience" hr={false} wrap={false}>
+            <Section title="Projects" hr={false} wrap={false}>
               <WorkExperience projects={formData?.projects} />
             </Section>
           )}
@@ -78,14 +79,14 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
               <Skills skills={formData?.technologies} />
             </Section>
           )}
-          {isValueValid(formData?.certificates) && (
-            <Section title="Certificates" hr={false} wrap={false}>
-              <Certificates certs={formData?.certificates} />
-            </Section>
-          )}
           {isValueValid(formData?.education) && (
             <Section title="Educations" hr={false}>
               <Education educations={formData?.education} />
+            </Section>
+          )}
+          {isValueValid(formData?.certificates) && (
+            <Section title="Certificates" hr={false} wrap={false}>
+              <Certificates certs={formData?.certificates} />
             </Section>
           )}
         </View>

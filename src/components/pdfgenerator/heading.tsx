@@ -7,6 +7,8 @@ const styles = StyleSheet.create({
   },
   profileImageWrapper: {
     position: 'absolute',
+    border: '5px solid #fff',
+    borderRadius: '70',
     top: 76,
     right: 60,
   },

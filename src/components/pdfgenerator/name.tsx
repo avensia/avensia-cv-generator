@@ -23,11 +23,11 @@ const Name = ({ formData }: CVFormData) => {
       <Text style={style.role}>{formData?.position}</Text>
       <View>
         <Text style={style.addDetails}>
-          <Link>{formData?.email}</Link>
+          <Link href={`mailto:${formData?.email}`}>{formData?.email}</Link>
         </Text>
         <Text style={style.addDetails}>{formData?.phone}</Text>
         <Text style={style.addDetails}>
-          <Link src="#">{formData?.linkedIn}</Link>
+          <Link href={formData?.linkedIn}>{formData?.linkedIn}</Link>
         </Text>
       </View>
     </View>
