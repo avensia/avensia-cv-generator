@@ -15,22 +15,24 @@ export async function POST(req: Request) {
   try {
     const payload = (await req.json()) as CvCreateFormRequest;
 
-    const { projects, education, workExperience, ...cvData} = payload;
+    //const { projects, education, workExperience, ...cvData} = payload;
 
     //acquire collections
     const cvCol = await getCollection<CvData & { createdAt: Date; updatedAt: Date; userId: ObjectId }>('cvs');
+    /*
     const eduCol = await getCollection<Education & { createdAt: Date; updatedAt: Date; user_id: ObjectId }>('educations');
     const workExCol = await getCollection<WorkExperience &{ createdAt: Date; updatedAt: Date; user_id: ObjectId }>('workexperiences');
     const projCol = await getCollection<Project & { createdAt: Date; updatedAt: Date; user_id: ObjectId }>('projects');
+    */
     
     //create CV document
     const { insertedId } = await cvCol.insertOne({
-      ...cvData,
+      ...payload,//cvData,
       createdAt: new Date(),
       updatedAt: new Date(),
       userId: new ObjectId(user.userId),
     });
-
+    /*
     //create related documents on affected tables
     await eduCol.insertMany(
         education.map(document => ({
@@ -56,6 +58,7 @@ export async function POST(req: Request) {
             updatedAt: new Date(),
         }))
     );
+    */
 
     return NextResponse.json({ id: insertedId.toString() }, { status: 201 });
   } catch (e) {

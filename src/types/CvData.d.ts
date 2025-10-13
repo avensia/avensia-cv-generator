@@ -10,4 +10,6 @@ type CvData = {
   about: string;
   technologies: string[];
   certificates: string[];
+  education: Education[];
+  projects: Project[];
 };
