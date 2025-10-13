@@ -110,7 +110,7 @@ export function useCv(options: UseCvOptions = {}) {
       },
       {
         optimisticData: next,
-        revalidate: false,
+        revalidate: true,
         rollbackOnError: false, // keep optimistic state if the request fails
         populateCache: true,
       },
@@ -147,7 +147,7 @@ export function useCv(options: UseCvOptions = {}) {
       typeof next === 'function'
         ? (prev?: CvWithId) => (next as (p?: CvWithId) => CvWithId)(prev ?? (initialData as CvWithId))
         : next,
-      { revalidate: false, populateCache: true },
+      { revalidate: true, populateCache: true },
     );
   };
 

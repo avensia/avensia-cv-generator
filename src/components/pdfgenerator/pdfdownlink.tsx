@@ -17,7 +17,7 @@ const Pdfdownlink = (props: PropsType) => {
         fileName={`${props.cvData?.fullName}Avensia-CV.pdf`}
         style={{ textDecoration: 'none', color: 'blue' }}
       >
-        {({ loading }) => <Button>{loading ? 'Generating PDF...' : 'Download PDF'}</Button>}
+        {({ loading }) => <Button variant="secondary">{loading ? 'Generating PDF...' : 'Download PDF'}</Button>}
       </PDFDownloadLink>
     </div>
   );

@@ -2,11 +2,12 @@ import React, { FunctionComponent, useEffect } from 'react';
 import { ObjectId } from 'mongodb';
 import { Input } from '@/components/ui/input';
 import ProfilePicture from './profilepicture';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import Projects from './formsections/projects';
 import { Button } from '@/components/ui/button';
+import PhoneField from './phonefield';
+import { FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import TextAreaFieldWithLimit from './textfieldareawithlimits';
 
 type PropsType = {
   initialData: CvData & { _id?: string | ObjectId };
@@ -113,137 +114,168 @@ const CVForm: FunctionComponent<PropsType> = ({
   //////////////////////////////////////////
 
   return (
-    <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => e.preventDefault()} className="space-y-8">
-      {/* Basic Info */}
-      <Input type="hidden" name="id" value={cvId} />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <ProfilePicture form={formState} onUploadImage={onUploadImage} />
-          {/* About */}
+    <FieldSet>
+      <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => e.preventDefault()} className="space-y-8">
+        {/* Basic Info */}
+        <Input type="hidden" name="id" value={cvId} />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <Label className="block text-sm font-medium">About</Label>
-            <Textarea
+            <ProfilePicture form={formState} onUploadImage={onUploadImage} />
+            {/* About */}
+            <TextAreaFieldWithLimit
+              label="About"
               value={formState.about}
-              onChange={e => handleChange('about', e.target.value)}
-              className="w-full rounded-xl border px-3 py-2"
-              rows={8}
+              onChange={about => handleChange('about', about)}
+              maxText={1000}
+              placeHolder="Write a concise professional summary (aim for 600-1000 characters)."
+            />
+          </div>
+          <div className="space-y-3">
+            <FieldGroup>
+              <FieldLabel htmlFor="full-name" className="block text-sm font-medium">
+                Full Name
+              </FieldLabel>
+              <Input
+                id="full-name"
+                type="text"
+                value={formState.fullName}
+                onChange={e => handleChange('fullName', e.target.value)}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <FieldLabel htmlFor="position" className="block text-sm font-medium">
+                Position
+              </FieldLabel>
+              <Input
+                id="position"
+                type="text"
+                value={formState.position}
+                onChange={e => handleChange('position', e.target.value)}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <FieldLabel htmlFor="email" className="block text-sm font-medium">
+                Email
+              </FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                value={formState.email}
+                onChange={e => handleChange('email', e.target.value)}
+              />
+            </FieldGroup>
+            <FieldGroup>
+              <FieldLabel htmlFor="linkedin" className="block text-sm font-medium">
+                LinkedIn
+              </FieldLabel>
+              <Input
+                id="linkedin"
+                type="url"
+                value={formState.linkedIn}
+                onChange={e => handleChange('linkedIn', e.target.value)}
+              />
+            </FieldGroup>
+            <PhoneField
+              value={formState.phone}
+              onChange={phoneField => {
+                console.log({ phoneField });
+                handleChange('phone', phoneField.e164);
+              }}
             />
           </div>
         </div>
+        <Separator />
+        {/* Projects */}
+        <Projects
+          projects={formState.projects}
+          addArrayItem={addArrayItem}
+          removeArrayItem={removeArrayItem}
+          updateArrayItem={updateArrayItem}
+        />
+        <Separator />
+        {/* Education */}
         <div className="space-y-3">
-          <div>
-            <Label className="block text-sm font-medium">Full Name</Label>
-            <Input type="text" value={formState.fullName} onChange={e => handleChange('fullName', e.target.value)} />
-          </div>
-          <div>
-            <Label className="block text-sm font-medium">Position</Label>
-            <Input type="text" value={formState.position} onChange={e => handleChange('position', e.target.value)} />
-          </div>
-          <div>
-            <Label className="block text-sm font-medium">Email</Label>
-            <Input type="email" value={formState.email} onChange={e => handleChange('email', e.target.value)} />
-          </div>
-          <div>
-            <Label className="block text-sm font-medium">LinkedIn</Label>
-            <Input type="url" value={formState.linkedIn} onChange={e => handleChange('linkedIn', e.target.value)} />
-          </div>
-          <div>
-            <Label className="block text-sm font-medium">Phone</Label>
-            <Input type="tel" value={formState.phone} onChange={e => handleChange('phone', e.target.value)} />
-          </div>
-        </div>
-      </div>
-      <Separator />
-      {/* Projects */}
-      <Projects
-        projects={formState.projects}
-        addArrayItem={addArrayItem}
-        removeArrayItem={removeArrayItem}
-        updateArrayItem={updateArrayItem}
-      />
-      <Separator />
-      {/* Education */}
-      <div className="space-y-3">
-        <SectionHeader title="Education" onAdd={() => addArrayItem('education', blankEdu)} addLabel="Add Education" />
-        {formState.education.length === 0 && (
-          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Education&quot; to create one.</p>
-        )}
-        {formState.education.map((ed: Education, i: number) => (
-          <div key={`ed-${i}`} className="space-y-2 rounded-2xl border p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Education</p>
-              <RemoveButton onClick={() => removeArrayItem('education', i)} />
-            </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              <Input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Degree"
-                value={ed.degree}
-                onChange={e => updateArrayItem('education', i, { degree: e.target.value })}
-              />
-              <Input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Institution"
-                value={ed.institution}
-                onChange={e => updateArrayItem('education', i, { institution: e.target.value })}
-              />
-              <Input
-                className="rounded-xl border px-3 py-2"
-                placeholder="Date"
-                value={ed.date}
-                onChange={e => updateArrayItem('education', i, { date: e.target.value })}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-      <Separator />
-      {/* Technologies */}
-      <div className="space-y-3">
-        <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Skillset" />
-        {formState.technologies.length === 0 && (
-          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Skillset&quot; to create one.</p>
-        )}
-        <div className="space-y-2">
-          {formState.technologies.map((tech: string, i: number) => (
-            <div key={`tech-${i}`} className="flex items-center gap-3">
-              <Input
-                className="flex-1 rounded-xl border px-3 py-2"
-                placeholder={`Skill`}
-                value={tech}
-                onChange={e => updateTechnology(i, e.target.value)}
-              />
-              <RemoveButton onClick={() => removeTechnology(i)} />
+          <SectionHeader title="Education" onAdd={() => addArrayItem('education', blankEdu)} addLabel="Add Education" />
+          {formState.education.length === 0 && (
+            <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Education&quot; to create one.</p>
+          )}
+          {formState.education.map((ed: Education, i: number) => (
+            <div key={`ed-${i}`} className="space-y-2 rounded-2xl border p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">Education</p>
+                <RemoveButton onClick={() => removeArrayItem('education', i)} />
+              </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <Input
+                  className="rounded-xl border px-3 py-2"
+                  placeholder="Degree"
+                  value={ed.degree}
+                  onChange={e => updateArrayItem('education', i, { degree: e.target.value })}
+                />
+                <Input
+                  className="rounded-xl border px-3 py-2"
+                  placeholder="Institution"
+                  value={ed.institution}
+                  onChange={e => updateArrayItem('education', i, { institution: e.target.value })}
+                />
+                <Input
+                  className="rounded-xl border px-3 py-2"
+                  placeholder="Date"
+                  value={ed.date}
+                  onChange={e => updateArrayItem('education', i, { date: e.target.value })}
+                />
+              </div>
             </div>
           ))}
         </div>
-      </div>
-      {/* Certificates */}
-      <div className="space-y-3">
-        <SectionHeader title="Certificates" onAdd={addCertificates} addLabel="Add Certificates" />
-        {formState.technologies.length === 0 && (
-          <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Certificates&quot; to create one.</p>
-        )}
-        <div className="space-y-2">
-          {formState?.certificates?.map((cert: string, i: number) => (
-            <div key={`cert-${i}`} className="flex items-center gap-3">
-              <Input
-                className="flex-1 rounded-xl border px-3 py-2"
-                placeholder={`Certificates`}
-                value={cert}
-                onChange={e => updateCertificates(i, e.target.value)}
-              />
-              <RemoveButton onClick={() => removeCertificates(i)} />
-            </div>
-          ))}
+        <Separator />
+        {/* Technologies */}
+        <div className="space-y-3">
+          <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Skillset" />
+          {formState.technologies.length === 0 && (
+            <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Skillset&quot; to create one.</p>
+          )}
+          <div className="space-y-2">
+            {formState.technologies.map((tech: string, i: number) => (
+              <div key={`tech-${i}`} className="flex items-center gap-3">
+                <Input
+                  className="flex-1 rounded-xl border px-3 py-2"
+                  placeholder={`Skill`}
+                  value={tech}
+                  onChange={e => updateTechnology(i, e.target.value)}
+                />
+                <RemoveButton onClick={() => removeTechnology(i)} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="flex justify-center">
-        <Button onClick={handleSubmit} className="w-1/6  px-4 py-3  shadow-sm">
-          Save CV
-        </Button>
-      </div>
-    </form>
+        {/* Certificates */}
+        <div className="space-y-3">
+          <SectionHeader title="Certificates" onAdd={addCertificates} addLabel="Add Certificates" />
+          {formState.technologies.length === 0 && (
+            <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Certificates&quot; to create one.</p>
+          )}
+          <div className="space-y-2">
+            {formState?.certificates?.map((cert: string, i: number) => (
+              <div key={`cert-${i}`} className="flex items-center gap-3">
+                <Input
+                  className="flex-1 rounded-xl border px-3 py-2"
+                  placeholder={`Certificates`}
+                  value={cert}
+                  onChange={e => updateCertificates(i, e.target.value)}
+                />
+                <RemoveButton onClick={() => removeCertificates(i)} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-center">
+          <Button onClick={handleSubmit} className="w-1/6  px-4 py-3  shadow-sm">
+            Save CV
+          </Button>
+        </div>
+      </form>
+    </FieldSet>
   );
 };
 
@@ -251,7 +283,7 @@ export default CVForm;
 
 //const blankWork = (): WorkExperience => ({ title: '', company: '', date: '' });
 export const blankEdu = (): Education => ({ degree: '', institution: '', date: '' });
-export const blankProj = (): Project => ({ title: '', date: '', projectDetails: '' });
+export const blankProj = (): Project => ({ title: '', role: '', date: '', projectDetails: '' });
 
 export function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () => void; addLabel?: string }) {
   return (

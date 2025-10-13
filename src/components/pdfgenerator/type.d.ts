@@ -3,7 +3,7 @@ type CVFormData = {
 };
 
 type CVFormProjectsData = {
-  projects?: WorkExperienceOrProject[];
+  projects?: Project[];
 };
 
 type CVFormEducationData = {

@@ -1,8 +1,11 @@
-import { ReactElement } from 'react';
+import { cn } from '@/lib/utils';
+import { ReactNode } from 'react';
 
-export const PageCenter: React.FunctionComponent<{ children: ReactElement }> = props => {
+type PropsType = { children: ReactNode; className?: string | undefined };
+
+export const PageCenter: React.FunctionComponent<PropsType> = props => {
   return (
-    <div className="flex justify-center items-center">
+    <div className={cn('flex justify-center items-center', props?.className)}>
       <div className="w-250 ">{props.children}</div>
     </div>
   );

@@ -3,14 +3,15 @@
 import React, { useEffect, useRef } from 'react';
 import { CvWithId } from '../useCv';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import CVForm from './components/cvform';
 import { useFormEvents } from './useFormEvents';
 import { LogoutAlert } from './components/logout';
 import { SaveAlert, SaveAlertHandle } from './components/savealert';
+import { useIsUpdated } from './useIsUpdated';
+import { useUnsavedChangesPrompt } from './useUnsavedChangesPrompt';
+import { UnsavedChangesModal } from './components/unsavedchangesmodal';
 
 export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
-  const router = useRouter();
   const saveAlertRef = useRef<SaveAlertHandle>(null);
   const {
     cvId,
@@ -25,8 +26,14 @@ export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
     isSaveSuccess,
   } = useFormEvents(initialForm);
 
+  const { isUpdated, initialSnapshot } = useIsUpdated<CvData>(formState, initialForm);
+
   const handleGeneratePDF = () => {
-    router.push('/previewcv', undefined);
+    attemptNavigate('/previewcv');
+  };
+
+  const handleDiscard = () => {
+    setFormState(initialSnapshot);
   };
 
   useEffect(() => {
@@ -35,10 +42,21 @@ export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
     }
   }, [isSaveSuccess]);
 
+  const { open, attemptNavigate, confirmDiscard, cancelStay, confirmSave } = useUnsavedChangesPrompt(isUpdated, {
+    onSave: handleSubmit,
+    onDiscard: handleDiscard,
+  });
+
   return (
     <div>
       <div className="w-full">
         <h1 className="text-2xl font-bold w-full flext text-center mb-6">Avensia CV Form</h1>
+        <UnsavedChangesModal
+          confirmSave={confirmSave}
+          confirmDiscard={confirmDiscard}
+          cancelStay={cancelStay}
+          isOpen={open}
+        />
         <SaveAlert isSaveSuccess={isSaveSuccess} ref={saveAlertRef} />
         <div className="flex justify-start w-full gap-5">
           <Button onClick={handleSubmit} type="submit" className="w-1/6  px-4 py-3  shadow-sm">

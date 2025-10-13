@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import { FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { blankProj, RemoveButton, SectionHeader } from '../cvform';
+import TextAreaFieldWithLimit from '../textfieldareawithlimits';
 
 type PropsType = {
   projects: Project[];
@@ -41,6 +41,16 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
                 />
               </FieldGroup>
               <FieldGroup>
+                <FieldLabel htmlFor={`project-role-${i}`}>Role</FieldLabel>
+                <Input
+                  id={`project-role-${i}`}
+                  className="rounded-xl border px-3 py-2"
+                  placeholder="Role"
+                  value={pr.role}
+                  onChange={e => updateArrayItem('projects', i, { role: e.target.value })}
+                />
+              </FieldGroup>
+              <FieldGroup>
                 <FieldLabel htmlFor={`project-date-${i}`}>Date</FieldLabel>
                 <Input
                   id={`project-date-${i}`}
@@ -51,17 +61,15 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
                 />
               </FieldGroup>
             </div>
-            <FieldGroup>
-              <FieldLabel htmlFor={`project-details-${i}`}>Project Details</FieldLabel>
-              <Textarea
-                id={`project-details-${i}`}
-                className="w-full rounded-xl border px-3 py-2"
-                placeholder="Project details"
-                rows={3}
-                value={pr.projectDetails}
-                onChange={e => updateArrayItem('projects', i, { projectDetails: e.target.value })}
-              />
-            </FieldGroup>
+            <TextAreaFieldWithLimit
+              value={pr.projectDetails}
+              onChange={projd => updateArrayItem('projects', i, { projectDetails: projd })}
+              maxText={800}
+              label="Project Details"
+              placeHolder="Write a concise Project Summary (aim for 600-800 characters)."
+              textRows={6}
+              htmlFor={`project-details-${i}`}
+            />
           </div>
         </FieldSet>
       ))}
