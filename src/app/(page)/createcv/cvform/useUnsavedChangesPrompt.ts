@@ -23,7 +23,6 @@ export function useUnsavedChangesPrompt(isDirty: boolean, opts: Options = {}) {
   // Warn on browser refresh/close
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
-      console.log({ isDirty });
       if (!isDirty) {
         window.removeEventListener('beforeunload', handler);
         return;
@@ -31,7 +30,9 @@ export function useUnsavedChangesPrompt(isDirty: boolean, opts: Options = {}) {
       e.preventDefault();
       e.returnValue = ''; // required for Chrome
     };
+
     window.addEventListener('beforeunload', handler);
+
     return () => window.removeEventListener('beforeunload', handler);
   }, [isDirty]);
 
@@ -49,10 +50,8 @@ export function useUnsavedChangesPrompt(isDirty: boolean, opts: Options = {}) {
 
   const confirmSave = useCallback(async () => {
     await opts.onSave?.(); // you can call resetInitial() inside your onSave
-    //const href = pendingHref;
     setOpen(false);
     setPendingHref(null);
-    // if (href) router.push(href);
   }, [opts]);
 
   const confirmDiscard = useCallback(async () => {

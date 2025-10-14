@@ -60,6 +60,7 @@ const CVForm: FunctionComponent<PropsType> = ({
 
     setImgFile(file);
     setImgPreviewUrl(url);
+    handleChange('imgDataUrl', url);
   };
 
   ///////////////////////////////////////////
@@ -178,7 +179,6 @@ const CVForm: FunctionComponent<PropsType> = ({
             <PhoneField
               value={formState.phone}
               onChange={phoneField => {
-                console.log({ phoneField });
                 handleChange('phone', phoneField.e164);
               }}
             />
