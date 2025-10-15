@@ -10,9 +10,14 @@ import { SaveAlert, SaveAlertHandle } from './components/savealert';
 import { useIsUpdated } from './useIsUpdated';
 import { useUnsavedChangesPrompt } from './useUnsavedChangesPrompt';
 import { UnsavedChangesModal } from './components/unsavedchangesmodal';
+import { H1 } from '@/components/ui/typography';
+import { FileText, Save } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
+import { useLoader } from '@/app/context/LoaderContext';
 
 export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
   const saveAlertRef = useRef<SaveAlertHandle>(null);
+  const { loading } = useLoader();
   const {
     cvId,
     setCvId,
@@ -50,7 +55,7 @@ export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
   return (
     <div>
       <div className="w-full">
-        <h1 className="text-2xl font-bold w-full flext text-center mb-6">Avensia CV Form</h1>
+        <H1 className="font-bold w-full flext text-center mb-6 lg:text-3xl">Avensia CV Form</H1>
         <UnsavedChangesModal
           confirmSave={confirmSave}
           confirmDiscard={confirmDiscard}
@@ -60,10 +65,16 @@ export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
         <SaveAlert isSaveSuccess={isSaveSuccess} ref={saveAlertRef} />
         <div className="flex justify-start w-full gap-5">
           <Button onClick={handleSubmit} type="submit" className="w-1/6  px-4 py-3  shadow-sm">
-            Save CV
+            {loading ? (
+              <Spinner />
+            ) : (
+              <>
+                <Save /> Save CV
+              </>
+            )}
           </Button>
           <Button variant="secondary" onClick={handleGeneratePDF} className="w-50" disabled={!initialForm._id}>
-            Generate CV as PDF
+            <FileText /> Generate CV as PDF
           </Button>
           <LogoutAlert />
         </div>

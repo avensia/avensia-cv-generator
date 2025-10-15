@@ -1,7 +1,8 @@
 'use client';
 import { parsePhoneNumber } from '@/app/lib/utils/parsePhoneNumber';
-import { FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import { FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as React from 'react';
 
 type CountryOption = {
@@ -65,13 +66,32 @@ export default function PhoneField({
   name,
   className,
 }: Props) {
-  const parsed = React.useMemo(() => parsePhoneNumber(value ?? ''), [value]);
+  // 1) Allowed dial codes (once)
+  const ALLOWED_DIAL_CODES = React.useMemo(() => COUNTRY_OPTIONS.map(c => c.dialCode), []);
 
-  const [countryDialCode, setCountryDialCode] = React.useState(parsed?.countryDialCode ?? defaultCountryDialCode);
-  const [national, setNational] = React.useState(parsed?.national ?? '');
-  const [touched, setTouched] = React.useState(false);
+  // 2) Initial parse of external value (NO selected-country hint yet)
+  const initialParsed = React.useMemo(() => {
+    return parsePhoneNumber(value ?? '', {
+      allowedDialCodes: ALLOWED_DIAL_CODES,
+    });
+  }, [value, ALLOWED_DIAL_CODES]);
 
-  // If parent changes `value` externally, sync it (guarded to avoid loops)
+  // 3) Local state — typed, and seeded from initialParsed
+  const [countryDialCode, setCountryDialCode] = React.useState<string>(
+    initialParsed?.countryDialCode ?? defaultCountryDialCode,
+  );
+  const [national, setNational] = React.useState<string>(initialParsed?.national ?? '');
+  const [touched, setTouched] = React.useState<boolean>(false);
+
+  // 4) Parse again WITH the selected-country hint (now that state exists)
+  const parsed = React.useMemo(() => {
+    return parsePhoneNumber(value ?? '', {
+      allowedDialCodes: ALLOWED_DIAL_CODES,
+      assumeDialCode: countryDialCode, // safe: countryDialCode is declared above
+    });
+  }, [value, countryDialCode, ALLOWED_DIAL_CODES]);
+
+  // 5) Sync effect (unchanged, but now fed by correct `parsed`)
   React.useEffect(() => {
     if (!parsed) return;
     const nextDial = parsed.countryDialCode ?? defaultCountryDialCode;
@@ -79,7 +99,7 @@ export default function PhoneField({
     if (nextDial !== countryDialCode) setCountryDialCode(nextDial);
     if (nextNat !== national) setNational(nextNat);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsed, defaultCountryDialCode]); // intentionally NOT depending on local state
+  }, [parsed, defaultCountryDialCode]);
 
   const buildPayload = (cd: string, n: string): PhoneFieldValue => {
     const natDigits = digitsOnly(n);
@@ -108,19 +128,25 @@ export default function PhoneField({
         <FieldLabel className="mb-1 block text-sm font-medium text-gray-800">{label}</FieldLabel>
         <div className="flex gap-2">
           <div className="w-44">
-            <select
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none"
+            <Select
               value={countryDialCode}
-              onChange={e => handleCountryChange(e.target.value)}
+              onValueChange={val => handleCountryChange(val)}
               disabled={disabled}
               aria-label="Country calling code"
             >
-              {COUNTRY_OPTIONS.map(c => (
-                <option key={c.iso2} value={c.dialCode}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="select country code" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {COUNTRY_OPTIONS.map(c => (
+                    <SelectItem key={c.iso2} value={c.dialCode}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <Input
@@ -141,10 +167,10 @@ export default function PhoneField({
         </div>
 
         <div className="mt-1 flex items-center justify-between">
-          <p className="text-xs text-gray-500">
+          <FieldDescription>
             Saved as <span className="font-mono">{preview}</span>
-          </p>
-          {touched && !valid && <p className="text-xs text-red-600">{error}</p>}
+          </FieldDescription>
+          {touched && !valid && <FieldDescription>{error} </FieldDescription>}
         </div>
       </FieldGroup>
     </FieldSet>

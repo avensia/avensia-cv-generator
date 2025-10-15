@@ -10,13 +10,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { logout } from '@/app/lib/auth';
+import { LogOut } from 'lucide-react';
 
 export function LogoutAlert() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="secondary" className="mb-5" type="submit">
-          Logout
+          <LogOut /> Logout
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

@@ -2,12 +2,8 @@ import { isValueValid } from '@/app/lib/utils/validations';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
-  list: { marginTop: 4 },
-  li: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 3,
-  },
+  list: { flexDirection: 'row', flexWrap: 'wrap', width: '100%' },
+  li: { flexDirection: 'row', width: '50%', paddingRight: 8, marginBottom: 3 },
   bullet: {
     width: 10, // fixed width keeps the indent
     textAlign: 'center',

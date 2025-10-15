@@ -1,8 +1,10 @@
 import React, { FunctionComponent } from 'react';
-import { FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import { FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { blankProj, RemoveButton, SectionHeader } from '../cvform';
+import { blankProj, SectionHeader } from '../cvform';
 import TextAreaFieldWithLimit from '../textfieldareawithlimits';
+import { P } from '@/components/ui/typography';
+import { CircleX } from 'lucide-react';
 
 type PropsType = {
   projects: Project[];
@@ -20,14 +22,14 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
         addLabel="Add Project"
       />
       {projects.length === 0 && (
-        <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Project&quot; to create one.</p>
+        <P className="text-sm text-gray-500">No entries yet. Click &quot;Add Project&quot; to create one.</P>
       )}
       {projects.map((pr, i) => (
         <FieldSet key={`pr-${i}`}>
           <div className="space-y-2 rounded-2xl border p-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Project</p>
-              <RemoveButton onClick={() => removeArrayItem('projects', i)} />
+              <P className="text-sm font-medium invisible">Project</P>
+              <CircleX onClick={() => removeArrayItem('projects', i)} size={20} />
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <FieldGroup className="mb-3">
@@ -39,6 +41,7 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
                   value={pr.title}
                   onChange={e => updateArrayItem('projects', i, { title: e.target.value })}
                 />
+                <FieldDescription>Enter the project name (e.g. Eurosko, Kid/Hemtex).</FieldDescription>
               </FieldGroup>
               <FieldGroup>
                 <FieldLabel htmlFor={`project-role-${i}`}>Role</FieldLabel>
@@ -49,6 +52,7 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
                   value={pr.role}
                   onChange={e => updateArrayItem('projects', i, { role: e.target.value })}
                 />
+                <FieldDescription>Specify your position in this project.</FieldDescription>
               </FieldGroup>
               <FieldGroup>
                 <FieldLabel htmlFor={`project-date-${i}`}>Date</FieldLabel>
@@ -59,6 +63,9 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
                   value={pr.date}
                   onChange={e => updateArrayItem('projects', i, { date: e.target.value })}
                 />
+                <FieldDescription>
+                  Enter the project duration (e.g. Jan 2023 - Dec 2024 or 2025 - current).
+                </FieldDescription>
               </FieldGroup>
             </div>
             <TextAreaFieldWithLimit

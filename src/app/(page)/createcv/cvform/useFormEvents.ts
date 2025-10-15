@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ObjectId } from 'mongodb';
 import { useCv } from '../useCv';
+import { useLoader } from '@/app/context/LoaderContext';
 
 export function useFormEvents(initialData: CvData & { _id?: string | ObjectId }) {
   const { saveCv } = useCv({ initialData });
@@ -13,8 +14,10 @@ export function useFormEvents(initialData: CvData & { _id?: string | ObjectId })
     id: '',
     errorMessage: '',
   });
+  const { setLoading } = useLoader();
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       let imgUrl = formState.imgDataUrl;
 
@@ -34,9 +37,11 @@ export function useFormEvents(initialData: CvData & { _id?: string | ObjectId })
 
       if (!cvId) setCvId(id);
       setSaveSuccess({ status: true, id });
+      setLoading(false);
     } catch (err) {
       console.error(err);
       setSaveSuccess({ status: false, id: '', errorMessage: err instanceof Error ? err.message : 'Unexpected error' });
+      setLoading(false);
     }
   };
 
