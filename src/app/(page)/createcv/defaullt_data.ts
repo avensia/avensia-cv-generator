@@ -11,4 +11,5 @@ export const CVFormData: CvData = {
   projects: [],
   technologies: [],
   certificates: [],
+  workExperience: [],
 };

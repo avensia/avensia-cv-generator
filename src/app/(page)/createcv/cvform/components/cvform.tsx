@@ -6,8 +6,13 @@ import { Separator } from '@/components/ui/separator';
 import Projects from './formsections/projects';
 import { Button } from '@/components/ui/button';
 import PhoneField from './phonefield';
-import { FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import { FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import TextAreaFieldWithLimit from './textfieldareawithlimits';
+import WorkExperience from './formsections/workexperience';
+import { H2 } from '@/components/ui/typography';
+import { CircleX, Save } from 'lucide-react';
+import { useLoader } from '@/app/context/LoaderContext';
+import { Spinner } from '@/components/ui/spinner';
 
 type PropsType = {
   initialData: CvData & { _id?: string | ObjectId };
@@ -34,6 +39,7 @@ const CVForm: FunctionComponent<PropsType> = ({
   handleChange,
   handleSubmit,
 }) => {
+  const { loading } = useLoader();
   // if your initialData might change (e.g., client nav), keep cvId in sync
   useEffect(() => {
     if (initialData?._id) setCvId(initialData._id.toString());
@@ -62,8 +68,6 @@ const CVForm: FunctionComponent<PropsType> = ({
     setImgPreviewUrl(url);
     handleChange('imgDataUrl', url);
   };
-
-  ///////////////////////////////////////////
 
   const updateArrayItem = <T,>(key: keyof CvData, idx: number, patch: T) => {
     setFormState(prev => {
@@ -193,6 +197,15 @@ const CVForm: FunctionComponent<PropsType> = ({
           updateArrayItem={updateArrayItem}
         />
         <Separator />
+
+        {/* Work Experience */}
+        <WorkExperience
+          experiences={formState.workExperience}
+          addArrayItem={addArrayItem}
+          removeArrayItem={removeArrayItem}
+          updateArrayItem={updateArrayItem}
+        />
+        <Separator />
         {/* Education */}
         <div className="space-y-3">
           <SectionHeader title="Education" onAdd={() => addArrayItem('education', blankEdu)} addLabel="Add Education" />
@@ -202,28 +215,47 @@ const CVForm: FunctionComponent<PropsType> = ({
           {formState.education.map((ed: Education, i: number) => (
             <div key={`ed-${i}`} className="space-y-2 rounded-2xl border p-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">Education</p>
-                <RemoveButton onClick={() => removeArrayItem('education', i)} />
+                <p className="text-sm font-medium invisible">Education</p>
+                <CircleX strokeWidth={1.25} onClick={() => removeArrayItem('education', i)} />
               </div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                <Input
-                  className="rounded-xl border px-3 py-2"
-                  placeholder="Degree"
-                  value={ed.degree}
-                  onChange={e => updateArrayItem('education', i, { degree: e.target.value })}
-                />
-                <Input
-                  className="rounded-xl border px-3 py-2"
-                  placeholder="Institution"
-                  value={ed.institution}
-                  onChange={e => updateArrayItem('education', i, { institution: e.target.value })}
-                />
-                <Input
-                  className="rounded-xl border px-3 py-2"
-                  placeholder="Date"
-                  value={ed.date}
-                  onChange={e => updateArrayItem('education', i, { date: e.target.value })}
-                />
+                <FieldGroup>
+                  <FieldLabel htmlFor={`degree-${i}`}>Degree</FieldLabel>
+                  <Input
+                    id={`degree-${i}`}
+                    className="rounded-xl border px-3 py-2"
+                    placeholder="Degree"
+                    value={ed.degree}
+                    onChange={e => updateArrayItem('education', i, { degree: e.target.value })}
+                  />
+                  <FieldDescription>
+                    Enter your degree or program (e.g. BS Engineering, BA Design, MSc Computer Science).
+                  </FieldDescription>
+                </FieldGroup>
+                <FieldGroup>
+                  <FieldLabel htmlFor={`institution-${i}`}>Institution</FieldLabel>
+                  <Input
+                    id={`institution-${i}`}
+                    className="rounded-xl border px-3 py-2"
+                    placeholder="Institution"
+                    value={ed.institution}
+                    onChange={e => updateArrayItem('education', i, { institution: e.target.value })}
+                  />
+                  <FieldDescription>Name of the school or university (e.g. University of Bohol).</FieldDescription>
+                </FieldGroup>
+                <FieldGroup>
+                  <FieldLabel htmlFor={`ed-date-${i}`}>Date</FieldLabel>
+                  <Input
+                    id={`ed-date-${i}`}
+                    className="rounded-xl border px-3 py-2"
+                    placeholder="Date"
+                    value={ed.date}
+                    onChange={e => updateArrayItem('education', i, { date: e.target.value })}
+                  />
+                  <FieldDescription>
+                    Study period (e.g. 2006–2007, Aug 2015–May 2019, or 2018–Present).
+                  </FieldDescription>
+                </FieldGroup>
               </div>
             </div>
           ))}
@@ -252,7 +284,7 @@ const CVForm: FunctionComponent<PropsType> = ({
         {/* Certificates */}
         <div className="space-y-3">
           <SectionHeader title="Certificates" onAdd={addCertificates} addLabel="Add Certificates" />
-          {formState.technologies.length === 0 && (
+          {formState.certificates.length === 0 && (
             <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Certificates&quot; to create one.</p>
           )}
           <div className="space-y-2">
@@ -271,7 +303,13 @@ const CVForm: FunctionComponent<PropsType> = ({
         </div>
         <div className="flex justify-center">
           <Button onClick={handleSubmit} className="w-1/6  px-4 py-3  shadow-sm">
-            Save CV
+            {loading ? (
+              <Spinner />
+            ) : (
+              <>
+                <Save /> Save CV
+              </>
+            )}
           </Button>
         </div>
       </form>
@@ -281,14 +319,14 @@ const CVForm: FunctionComponent<PropsType> = ({
 
 export default CVForm;
 
-//const blankWork = (): WorkExperience => ({ title: '', company: '', date: '' });
+export const blankWork = (): WorkExperience => ({ company: '', role: '', date: '', workDetails: '' });
 export const blankEdu = (): Education => ({ degree: '', institution: '', date: '' });
 export const blankProj = (): Project => ({ title: '', role: '', date: '', projectDetails: '' });
 
 export function SectionHeader({ title, onAdd, addLabel }: { title: string; onAdd?: () => void; addLabel?: string }) {
   return (
     <div className="flex items-center justify-between">
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <H2 className="text-lg font-semibold">{title}</H2>
       {onAdd && (
         <Button type="button" onClick={onAdd} className="px-3 py-1.5 text-sm">
           {addLabel ?? 'Add'}

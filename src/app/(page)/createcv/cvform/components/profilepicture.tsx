@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ImageCropper from './imagecropper';
 import { dataURLtoFile } from '@/app/lib/utils/upload';
+import { Upload } from 'lucide-react';
 
 type PropsType = {
   form: CvData;
@@ -48,7 +49,9 @@ const ProfilePicture: React.FunctionComponent<PropsType> = props => {
             </Avatar>
           )}
           <DialogTrigger asChild>
-            <Button>Update Photo</Button>
+            <Button>
+              <Upload /> Update Photo
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px] w-900 h-150">
             <ImageCropper updateAvatar={updateAvatar} />

@@ -4,11 +4,12 @@ import { Heading } from './heading';
 import Name from './name';
 import Section from './section';
 import About from './aboutme';
-import WorkExperience from './workexperience';
+import Projects from './projects';
 import Skills from './skills';
 import Certificates from './certificates';
 import Education from './education';
 import { isValueValid } from '@/app/lib/utils/validations';
+import WorkExperience from './workexperience';
 
 const coverUrl = '/assets/images/CoverPhoto-crop.jpg';
 const samplePFUrl = '/assets/images/avensia-logo-light.jpg';
@@ -71,7 +72,12 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
           )}
           {isValueValid(formData?.projects) && (
             <Section title="Projects" hr={false} wrap={false}>
-              <WorkExperience projects={formData?.projects} />
+              <Projects projects={formData?.projects} />
+            </Section>
+          )}
+          {isValueValid(formData?.workExperience) && (
+            <Section title="Work Experience" hr={false} wrap={false}>
+              <WorkExperience workExperience={formData?.workExperience} />
             </Section>
           )}
           {isValueValid(formData?.technologies) && (

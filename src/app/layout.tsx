@@ -2,10 +2,11 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
 import { getServerSession } from 'next-auth';
-import { ThemeProvider } from 'next-themes';
-import GlobalHeader from '@/components/header';
+//import GlobalHeader from '@/components/header';
 import SessionProviderClient from './components/SessionProviderClient';
 import 'react-image-crop/dist/ReactCrop.css';
+import { ThemeProvider } from '@/components/theme-provider';
+import { LoaderProvider } from './context/LoaderContext';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -29,15 +30,17 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.className} antialiased font-nunito-sans font-nunito `}>
         <SessionProviderClient session={session}>
-          <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" disableTransitionOnChange>
-            <main>
-              {session?.user && (
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+            <LoaderProvider>
+              <main>
+                {/* {session?.user && (
                 <section>
                   <GlobalHeader />
                 </section>
-              )}
-              <section>{children}</section>
-            </main>
+              )} */}
+                <section>{children}</section>
+              </main>
+            </LoaderProvider>
           </ThemeProvider>
         </SessionProviderClient>
       </body>

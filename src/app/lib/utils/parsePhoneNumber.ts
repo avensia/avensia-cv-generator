@@ -4,41 +4,45 @@ export interface ParsedPhoneNumber {
   national: string;
 }
 
+type ParseOpts = {
+  /** The list of dial codes you support, e.g. ["63","46","47","1"] */
+  allowedDialCodes: string[];
+  /** If you already know which country is selected, pass its dial code to force the split */
+  assumeDialCode?: string;
+};
+
 /**
- * Parses a phone number in E.164 format (e.g. +639760002014)
- * and returns its components, or undefined if input is invalid.
- *
- * @param phone - The full phone number string starting with '+'
- * @returns An object containing e164, countryDialCode, and national, or undefined
+ * Parses an E.164 phone (e.g. "+19760002104") into dial code + national.
+ * Uses longest-prefix match against allowed dial codes; if assumeDialCode is
+ * provided and matches the start, it is used directly.
  */
-export function parsePhoneNumber(phone?: string): ParsedPhoneNumber | undefined {
-  // Handle undefined, null, or non-string input
-  if (!phone || typeof phone !== 'string') {
-    console.warn('parsePhoneNumber: input is undefined or not a string.');
-    return undefined;
+export function parsePhoneNumber(phone?: string, opts?: ParseOpts): ParsedPhoneNumber | undefined {
+  if (!phone || typeof phone !== 'string') return undefined;
+
+  const compact = phone.replace(/\s+/g, '');
+  if (!compact.startsWith('+')) return undefined;
+
+  const digits = compact.slice(1);
+  if (!/^\d+$/.test(digits)) return undefined;
+
+  const allowed = opts?.allowedDialCodes ?? [];
+  // If the caller knows the selected code and it matches, use it.
+  if (opts?.assumeDialCode && digits.startsWith(opts.assumeDialCode)) {
+    const code = opts.assumeDialCode;
+    return { e164: `+${digits}`, countryDialCode: code, national: digits.slice(code.length) };
   }
 
-  // Ensure it starts with '+'
-  if (!phone.startsWith('+')) {
-    console.warn('parsePhoneNumber: Invalid phone number format. Must start with +');
-    return undefined;
-  }
+  // Longest-prefix match from the allowed list
+  const code = allowed
+    .slice()
+    .sort((a, b) => b.length - a.length) // longest first
+    .find(dc => digits.startsWith(dc));
 
-  // Basic validation — check length
-  if (phone.length < 4) {
-    console.warn('parsePhoneNumber: Phone number too short.');
-    return undefined;
-  }
-
-  // Extract the country dial code (for simplicity, assume up to 3 digits)
-  const countryDialCode = phone.substring(1, 3); // e.g., "63"
-
-  // Extract the national part (remaining digits)
-  const national = phone.substring(3); // e.g., "9760002014"
+  if (!code) return undefined;
 
   return {
-    e164: phone,
-    countryDialCode,
-    national,
+    e164: `+${digits}`,
+    countryDialCode: code,
+    national: digits.slice(code.length),
   };
 }

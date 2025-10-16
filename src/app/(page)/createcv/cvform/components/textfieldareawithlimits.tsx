@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldGroup, FieldLabel } from '@/components/ui/field';
+import { FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useState, useMemo, ChangeEvent, useEffect } from 'react';
@@ -61,11 +61,7 @@ export default function TextAreaFieldWithLimit({
 
   return (
     <FieldGroup className={cn('space-y-2', className)}>
-      {label && (
-        <FieldLabel htmlFor={htmlFor} className="block text-sm font-medium text-gray-900">
-          {label}
-        </FieldLabel>
-      )}
+      {label && <FieldLabel htmlFor={htmlFor}>{label}</FieldLabel>}
 
       <Textarea
         id={htmlFor}
@@ -79,12 +75,12 @@ export default function TextAreaFieldWithLimit({
       />
 
       <div className="flex items-baseline justify-between">
-        <p id="about-help" className="text-xs text-gray-500">
+        <FieldDescription>
           Tip: Aim for <span className="font-medium">{`${MIN_RECOMMENDED}-${MAX}`}</span>.
-        </p>
-        <p id="about-counter" className={`text-xs tabular-nums ${counterClass}`} aria-live="polite">
+        </FieldDescription>
+        <FieldDescription className={counterClass} aria-live="polite">
           {about.length} / {MAX}
-        </p>
+        </FieldDescription>
       </div>
     </FieldGroup>
   );

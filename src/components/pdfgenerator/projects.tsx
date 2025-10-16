@@ -1,10 +1,6 @@
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 
 const style = StyleSheet.create({
-  company: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   maincontainer: { marginBottom: 10 },
   topContainer: {
     display: 'flex',
@@ -20,34 +16,39 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
+  title: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   position: {
     fontSize: 12,
     fontWeight: 600,
     marginRight: 8,
   },
   tenureship: {
+    fontWeight: 500,
     fontSize: 10,
   },
   description: { marginTop: 8 },
 });
 
-const WorkExperience = ({ workExperience }: CVFormWorkExperienceData) => (
+const Projects = ({ projects }: CVFormProjectsData) => (
   <View>
-    {workExperience &&
-      workExperience.length > 0 &&
-      workExperience.map((experience, idx) => (
-        <View key={`${idx} - ${experience.company}`} style={style.maincontainer}>
+    {projects &&
+      projects.length > 0 &&
+      projects.map((proj, idx) => (
+        <View key={`${idx} - ${proj.title}`} style={style.maincontainer}>
           <View style={style.topContainer}>
-            <Text style={style.company}>{experience.company}</Text>
+            <Text style={style.title}>{proj.title}</Text>
             <View style={style.roleTenureContainer}>
-              {experience.role && <Text style={style.position}>{experience.role}</Text>}
-              {experience.date && <Text style={style.tenureship}>{experience.date}</Text>}
+              {proj.role && <Text style={style.position}>{proj.role}</Text>}
+              {proj.date && <Text style={style.tenureship}>{proj.date}</Text>}
             </View>
           </View>
-          <Text style={style.description}>{experience.workDetails}</Text>
+          <Text style={style.description}>{proj.projectDetails}</Text>
         </View>
       ))}
   </View>
 );
 
-export default WorkExperience;
+export default Projects;
