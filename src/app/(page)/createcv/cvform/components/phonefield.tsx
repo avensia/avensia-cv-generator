@@ -125,7 +125,7 @@ export default function PhoneField({
   return (
     <FieldSet className={className}>
       <FieldGroup>
-        <FieldLabel className="mb-1 block text-sm font-medium text-gray-800">{label}</FieldLabel>
+        <FieldLabel>{label}</FieldLabel>
         <div className="flex gap-2">
           <div className="w-44">
             <Select
