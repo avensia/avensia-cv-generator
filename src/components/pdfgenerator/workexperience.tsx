@@ -5,28 +5,23 @@ const style = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-  maincontainer: { marginBottom: 10 },
+  maincontainer: { marginBottom: 25 },
   topContainer: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginTop: 12,
-    marginBottom: 12,
-  },
-  roleTenureContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
   },
   position: {
     fontSize: 12,
     fontWeight: 600,
     marginRight: 8,
   },
+  companyRoleContainer: {
+    gap: 5,
+  },
   tenureship: {
-    fontSize: 10,
+    fontWeight: 400,
   },
   description: { marginTop: 8 },
 });
@@ -38,11 +33,11 @@ const WorkExperience = ({ workExperience }: CVFormWorkExperienceData) => (
       workExperience.map((experience, idx) => (
         <View key={`${idx} - ${experience.company}`} style={style.maincontainer}>
           <View style={style.topContainer}>
-            <Text style={style.company}>{experience.company}</Text>
-            <View style={style.roleTenureContainer}>
-              {experience.role && <Text style={style.position}>{experience.role}</Text>}
-              {experience.date && <Text style={style.tenureship}>{experience.date}</Text>}
+            <View style={style.companyRoleContainer}>
+              <Text style={style.company}>{experience.company}</Text>
+              <Text style={style.position}>{experience.role}</Text>
             </View>
+            {experience.date && <Text style={style.tenureship}>{experience.date}</Text>}
           </View>
           <Text style={style.description}>{experience.workDetails}</Text>
         </View>

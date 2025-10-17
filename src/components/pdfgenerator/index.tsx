@@ -8,8 +8,8 @@ import Projects from './projects';
 import Skills from './skills';
 import Certificates from './certificates';
 import Education from './education';
-import { isValueValid } from '@/app/lib/utils/validations';
 import WorkExperience from './workexperience';
+import { isValueValid } from '@/app/lib/utils/validations';
 
 const coverUrl = '/assets/images/CoverPhoto-crop.jpg';
 const samplePFUrl = '/assets/images/avensia-logo-light.jpg';
@@ -23,17 +23,15 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     fontFamily: 'Poppins',
-    display: 'flex',
-    fontSize: 12,
+    fontSize: 11,
     color: '#0F2037',
+    paddingTop: 20,
+    paddingBottom: 10,
   },
   layout: {
     marginLeft: 36,
     marginRight: 36,
     marginTop: -50,
-  },
-  container: {
-    display: 'flex',
   },
   name: {
     fontSize: 24,
@@ -54,9 +52,9 @@ const styles = StyleSheet.create({
 
 export const CreatePDF = ({ formData }: { formData?: CvData }) => {
   return (
-    <Document>
-      <Page style={styles.page} orientation={'portrait'}>
-        <View style={{ height: 200 }}>
+    <Document author="Avensia">
+      <Page style={styles.page} size="LEGAL" orientation="portrait" wrap={false}>
+        <View style={{ height: 200, marginTop: -20 }}>
           <Heading
             coverUrl={coverUrl ?? ''}
             samplePFUrl={formData?.imgDataUrl ? formData?.imgDataUrl : samplePFUrl}
@@ -64,34 +62,36 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
           />
         </View>
         <View style={styles.layout}>
-          <Name formData={formData} />
+          <Section hr={false} wrap>
+            <Name formData={formData} />
+          </Section>
           {isValueValid(formData?.about) && (
-            <Section title="About" hr={false} wrap={false}>
+            <Section title="About" hr={false} wrap>
               <About aboutMe={formData?.about} />
             </Section>
           )}
           {isValueValid(formData?.projects) && (
-            <Section title="Projects" hr={false} wrap={false}>
+            <Section title="Projects" hr={false} wrap>
               <Projects projects={formData?.projects} />
             </Section>
           )}
           {isValueValid(formData?.workExperience) && (
-            <Section title="Work Experience" hr={false} wrap={false}>
+            <Section title="Work Experience" hr wrap>
               <WorkExperience workExperience={formData?.workExperience} />
             </Section>
           )}
           {isValueValid(formData?.technologies) && (
-            <Section title="Skills" hr={false} wrap={false}>
+            <Section title="Skills" hr wrap>
               <Skills skills={formData?.technologies} />
             </Section>
           )}
           {isValueValid(formData?.education) && (
-            <Section title="Educations" hr={false}>
+            <Section title="Educations" hr wrap>
               <Education educations={formData?.education} />
             </Section>
           )}
           {isValueValid(formData?.certificates) && (
-            <Section title="Certificates" hr={false} wrap={false}>
+            <Section title="Certificates" hr wrap>
               <Certificates certs={formData?.certificates} />
             </Section>
           )}

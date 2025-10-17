@@ -6,19 +6,17 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
   },
   role: {
-    fontSize: 13,
     fontWeight: '500',
     marginTop: 10,
   },
   addDetails: {
-    fontSize: 11,
     marginTop: 10,
   },
 });
 
 const Name = ({ formData }: CVFormData) => {
   return (
-    <View wrap={false}>
+    <View>
       <Text style={style.name}>{formData?.fullName}</Text>
       <Text style={style.role}>{formData?.position}</Text>
       <View>
