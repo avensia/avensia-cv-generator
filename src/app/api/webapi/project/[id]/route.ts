@@ -57,3 +57,34 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Server error in getting Education documents.' }, { status: 500 });
   }
 }
+
+ export async function DELETE(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+
+  if(!id){
+    return NextResponse.json({error: "Missing user id parameter."}, {status: 422})
+  }
+
+  try{
+    const userCol = await getCollection<UserDoc>('users');
+    const projCol = await getCollection<Project & { createdAt: Date; updatedAt: Date; user_id: ObjectId }>('projects');
+    
+    if (id) {
+      const doc = await userCol.findOne({ _id: new ObjectId(id) });
+      if (!doc) {
+        return NextResponse.json({ error: 'User not found.' }, { status: 404 });
+      }
+    }
+    const result = await projCol.deleteOne({ user_id: new ObjectId(id!) });
+
+    if (result.deletedCount === 1) {
+      return NextResponse.json({ message: "Project Document deleted successfully" }, { status: 200 });
+    } else {
+      return NextResponse.json({ message: "Project Document not found" }, { status: 404 });
+    }
+  }catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'Server error in deleting Project documents.' }, { status: 500 });
+  }
+}
