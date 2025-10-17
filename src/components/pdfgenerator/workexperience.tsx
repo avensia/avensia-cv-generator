@@ -2,7 +2,7 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 
 const style = StyleSheet.create({
   company: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   maincontainer: { marginBottom: 25 },
@@ -13,7 +13,6 @@ const style = StyleSheet.create({
     justifyContent: 'space-between',
   },
   position: {
-    fontSize: 12,
     fontWeight: 600,
     marginRight: 8,
   },
@@ -21,6 +20,7 @@ const style = StyleSheet.create({
     gap: 5,
   },
   tenureship: {
+    fontSize: 10,
     fontWeight: 400,
   },
   description: { marginTop: 8 },

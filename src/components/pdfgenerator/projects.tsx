@@ -12,15 +12,15 @@ const style = StyleSheet.create({
   },
   titleRolContainer: { gap: 5 },
   title: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   position: {
-    fontSize: 12,
     fontWeight: 600,
     marginRight: 8,
   },
   tenureship: {
+    fontSize: 10,
     fontWeight: 400,
   },
   description: { marginTop: 8 },
