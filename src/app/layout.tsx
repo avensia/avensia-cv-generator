@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
-import { getServerSession } from 'next-auth';
+//import { getServerSession } from 'next-auth';
 //import GlobalHeader from '@/components/header';
-import SessionProviderClient from './components/SessionProviderClient';
+//import SessionProviderClient from './components/SessionProviderClient';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { LoaderProvider } from './context/LoaderContext';
+import SWRProviders from './context/SWRContext';
+import getAuthUser from '@/lib/database/getAuthUser';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -25,13 +27,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  //const session = await getServerSession();
+  const user = await getAuthUser();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.className} antialiased font-nunito-sans font-nunito `}>
-        <SessionProviderClient session={session}>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-            <LoaderProvider>
+        {/* <SessionProviderClient session={session}> */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <LoaderProvider>
+            <SWRProviders user={{ id: user?.userId ?? '' }}>
               <main>
                 {/* {session?.user && (
                 <section>
@@ -40,9 +45,10 @@ export default async function RootLayout({
               )} */}
                 <section>{children}</section>
               </main>
-            </LoaderProvider>
-          </ThemeProvider>
-        </SessionProviderClient>
+            </SWRProviders>
+          </LoaderProvider>
+        </ThemeProvider>
+        {/* </SessionProviderClient> */}
       </body>
     </html>
   );
