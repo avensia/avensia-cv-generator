@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { CvWithId } from '../useCv';
 import { Button } from '@/components/ui/button';
 import CVForm from './components/cvform';
 import { useFormEvents } from './useFormEvents';
@@ -15,7 +14,7 @@ import { FileText, Save } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
 import { useLoader } from '@/app/context/LoaderContext';
 
-export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
+export default function CVFormPage({ initialForm }: { initialForm: CvData }) {
   const saveAlertRef = useRef<SaveAlertHandle>(null);
   const { loading } = useLoader();
   const {
@@ -73,7 +72,7 @@ export default function CVFormPage({ initialForm }: { initialForm: CvWithId }) {
               </>
             )}
           </Button>
-          <Button variant="secondary" onClick={handleGeneratePDF} className="w-50" disabled={!initialForm._id}>
+          <Button variant="secondary" onClick={handleGeneratePDF} className="w-50" disabled={!initialForm?.cvId}>
             <FileText /> Generate CV as PDF
           </Button>
           <LogoutAlert />

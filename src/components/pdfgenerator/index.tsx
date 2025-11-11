@@ -80,9 +80,9 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
               <WorkExperience workExperience={formData?.workExperience} />
             </Section>
           )}
-          {isValueValid(formData?.technologies) && (
+          {isValueValid(formData?.skills) && (
             <Section title="Skills" hr wrap>
-              <Skills skills={formData?.technologies} />
+              <Skills skills={formData?.skills} />
             </Section>
           )}
           {isValueValid(formData?.education) && (

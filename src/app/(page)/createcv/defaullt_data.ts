@@ -1,5 +1,6 @@
 // Seed Data (replace with import if needed)
 export const CVFormData: CvData = {
+  cvId: '',
   fullName: '',
   imgDataUrl: '',
   position: '',
@@ -9,7 +10,7 @@ export const CVFormData: CvData = {
   about: '',
   education: [],
   projects: [],
-  technologies: [],
+  skills: [],
   certificates: [],
   workExperience: [],
 };

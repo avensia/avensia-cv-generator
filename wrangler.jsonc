@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "avensia-cv-tools-workers",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "SESSION_SECRET_KEY": "fi35VYPbaO6CY0pDhKi/ttzsaLV2303X5pbh+yIQj8Q="
+  },
+  "d1_databases": [
+    {
+      "binding": "cvs",
+      "database_name": "cv-tools-db-dev",
+      "database_id": "0084db35-bf13-4fa5-957e-021afbdc492e"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "cvtools-r2"
+    }
+  ]
+}
