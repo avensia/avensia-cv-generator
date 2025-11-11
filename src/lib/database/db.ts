@@ -24,7 +24,7 @@ const uri = process.env.DB_URI!;
 if (!uri) throw new Error('Mongo URI not found!');
 
 // Name of the MongoDB database to connect to
-const DB_NAME = 'avensia_cv_generator_db';
+const DB_NAME = 'avensia_cv_generator_db_dev';
 
 //Type definition for the Mongo cache structure
 type MongoCache = {

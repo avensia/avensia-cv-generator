@@ -1,0 +1,45 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "avensia-cv-tools-dev",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat", "enable_nodejs_http_modules"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "cvs",
+      "database_name": "cv-tools-db-dev",
+      "database_id": "0084db35-bf13-4fa5-957e-021afbdc492e"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "cvtools-r2"
+    }
+  ],
+  "env": {
+    "production": {
+      "name": "avensia-cv-tools-production",
+      "vars": {
+        "SESSION_SECRET_KEY": "fi35VYPbaO6CY0pDhKi/ttzsaLV2303X5pbh+yIQj8Q="
+      },
+      "r2_buckets": [
+        {
+          "binding": "R2_BUCKET",
+          "bucket_name": "cvtools-prod-r2"
+        }
+      ],
+      "d1_databases": [
+        {
+          "binding": "cvs",
+          "database_name": "cv-tools-db-prod",
+          "database_id": "98f1c9a7-c037-4142-bc30-33b539570d73"
+        }
+      ]
+    }
+  }
+}

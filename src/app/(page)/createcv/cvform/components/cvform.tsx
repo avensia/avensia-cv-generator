@@ -1,5 +1,4 @@
 import React, { FunctionComponent, useEffect } from 'react';
-import { ObjectId } from 'mongodb';
 import { Input } from '@/components/ui/input';
 import ProfilePicture from './profilepicture';
 import { Separator } from '@/components/ui/separator';
@@ -15,7 +14,7 @@ import { useLoader } from '@/app/context/LoaderContext';
 import { Spinner } from '@/components/ui/spinner';
 
 type PropsType = {
-  initialData: CvData & { _id?: string | ObjectId };
+  initialData: CvData;
   formState: CvData;
   cvId: string;
   setCvId: React.Dispatch<React.SetStateAction<string>>;
@@ -42,9 +41,9 @@ const CVForm: FunctionComponent<PropsType> = ({
   const { loading } = useLoader();
   // if your initialData might change (e.g., client nav), keep cvId in sync
   useEffect(() => {
-    if (initialData?._id) setCvId(initialData._id.toString());
+    if (initialData?.cvId) setCvId(initialData?.cvId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialData?._id]);
+  }, [initialData?.cvId]);
 
   useEffect(() => {
     return () => {
@@ -107,10 +106,10 @@ const CVForm: FunctionComponent<PropsType> = ({
     });
   };
 
-  const addTechnology = () => addArrayItem('technologies', () => '');
+  const addTechnology = () => addArrayItem('skills', () => '');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateTechnology = (idx: number, value: string) => updateArrayItem<string>('technologies', idx, value as any);
-  const removeTechnology = (idx: number) => removeArrayItem('technologies', idx);
+  const updateTechnology = (idx: number, value: string) => updateArrayItem<string>('skills', idx, value as any);
+  const removeTechnology = (idx: number) => removeArrayItem('skills', idx);
 
   const addCertificates = () => addArrayItem('certificates', () => '');
   const updateCertificates = (idx: number, value: string) => updateArrayItem<string>('certificates', idx, value);
@@ -209,10 +208,10 @@ const CVForm: FunctionComponent<PropsType> = ({
         {/* Education */}
         <div className="space-y-3">
           <SectionHeader title="Education" onAdd={() => addArrayItem('education', blankEdu)} addLabel="Add Education" />
-          {formState.education.length === 0 && (
+          {formState.education?.length === 0 && (
             <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Education&quot; to create one.</p>
           )}
-          {formState.education.map((ed: Education, i: number) => (
+          {formState?.education?.map((ed: Education, i: number) => (
             <div key={`ed-${i}`} className="space-y-2 rounded-2xl border p-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium invisible">Education</p>
@@ -264,11 +263,11 @@ const CVForm: FunctionComponent<PropsType> = ({
         {/* Technologies */}
         <div className="space-y-3">
           <SectionHeader title="Skillset" onAdd={addTechnology} addLabel="Add Skillset" />
-          {formState.technologies.length === 0 && (
+          {formState.skills?.length === 0 && (
             <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Skillset&quot; to create one.</p>
           )}
           <div className="space-y-2">
-            {formState.technologies.map((tech: string, i: number) => (
+            {formState.skills.map((tech: string, i: number) => (
               <div key={`tech-${i}`} className="flex items-center gap-3">
                 <Input
                   className="flex-1 rounded-xl border px-3 py-2"
@@ -284,7 +283,7 @@ const CVForm: FunctionComponent<PropsType> = ({
         {/* Certificates */}
         <div className="space-y-3">
           <SectionHeader title="Certificates" onAdd={addCertificates} addLabel="Add Certificates" />
-          {formState.certificates.length === 0 && (
+          {formState.certificates?.length === 0 && (
             <p className="text-sm text-gray-500">No entries yet. Click &quot;Add Certificates&quot; to create one.</p>
           )}
           <div className="space-y-2">

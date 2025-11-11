@@ -17,12 +17,12 @@ const Projects: FunctionComponent<PropsType> = ({ projects, addArrayItem, remove
   return (
     <div className="space-y-3">
       <SectionHeader
-        title="Avensia Projects"
+        title="Avensia Customers"
         onAdd={() => addArrayItem('projects', blankProj)}
         addLabel="Add Project"
       />
       {projects.length === 0 && (
-        <P className="text-sm text-gray-500">No entries yet. Click &quot;Add Project&quot; to create one.</P>
+        <P className="text-sm text-gray-500">No entries yet. Click &quot;Avensia Customers&quot; to create one.</P>
       )}
       {projects.map((pr, i) => (
         <FieldSet key={`pr-${i}`}>

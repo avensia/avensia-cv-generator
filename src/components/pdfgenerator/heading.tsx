@@ -32,7 +32,10 @@ export const Heading = ({ coverUrl, samplePFUrl, PFurl }: HeadingProps) => (
   <View>
     <Image src={coverUrl} />
     <View style={styles.profileImageWrapper}>
-      <Image style={styles.profileImage} src={PFurl ? PFurl : samplePFUrl} />
+      <Image
+        style={styles.profileImage}
+        src={PFurl ? `/api/cloudflare/fetch-photo/${encodeURIComponent(PFurl)}` : samplePFUrl}
+      />
     </View>
   </View>
 );

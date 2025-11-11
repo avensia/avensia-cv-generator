@@ -16,17 +16,23 @@ const ProfilePicture: React.FunctionComponent<PropsType> = props => {
   const { form, onUploadImage } = props;
   const [avatarUrl, setAvatarUrl] = useState<string>();
 
-  const updateAvatar = (img: string | Blob, filename?: string) => {
+  const updateAvatar = async (img: string | Blob, filename?: string) => {
+    // base64 path (legacy / existing data)
     if (typeof img === 'string') {
-      // only used if some other component still sends base64
       setAvatarUrl(img);
-      onUploadImage(dataURLtoFile(img) ?? null);
+      const file = dataURLtoFile(img, filename ?? 'avatar.jpg');
+      onUploadImage(file ?? null);
       return;
     }
 
-    // blob/file path (new)
+    // blob/file path (from ImageCropper – assumed already JPEG)
     const file =
-      img instanceof File ? img : new File([img], filename ?? 'avatar.webp', { type: img.type || 'image/webp' });
+      img instanceof File
+        ? img
+        : new File([img], filename ?? 'avatar.jpg', {
+            type: img.type || 'image/jpeg',
+          });
+
     const url = URL.createObjectURL(file);
     setAvatarUrl(url);
     onUploadImage(file);
@@ -39,7 +45,7 @@ const ProfilePicture: React.FunctionComponent<PropsType> = props => {
         <div className="flex items-start gap-4">
           {form.imgDataUrl ? (
             <Avatar className="h-24 w-24 rounded-xl border bg-gray-300">
-              <AvatarImage src={avatarUrl ?? form.imgDataUrl} />
+              <AvatarImage src={avatarUrl ?? `/api/cloudflare/fetch-photo/${encodeURIComponent(form.imgDataUrl)}`} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           ) : (
@@ -48,11 +54,13 @@ const ProfilePicture: React.FunctionComponent<PropsType> = props => {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           )}
+
           <DialogTrigger asChild>
             <Button>
               <Upload /> Update Photo
             </Button>
           </DialogTrigger>
+
           <DialogContent className="sm:max-w-[425px] w-900 h-150">
             <ImageCropper updateAvatar={updateAvatar} />
           </DialogContent>

@@ -10,7 +10,7 @@ const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
 
 type PropsType = {
-  updateAvatar: (img: string | Blob, filename?: string) => void;
+  updateAvatar: (file: File) => void;
 };
 
 const ImageCropper: FunctionComponent<PropsType> = props => {
@@ -88,16 +88,31 @@ const ImageCropper: FunctionComponent<PropsType> = props => {
       const tmp = document.createElement('canvas');
       tmp.width = canvas.width * s;
       tmp.height = canvas.height * s;
-      tmp.getContext('2d')!.drawImage(canvas, 0, 0, tmp.width, tmp.height);
+
+      const tmpCtx = tmp.getContext('2d')!;
+      // OPTIONAL: fill background so JPEG doesn’t get black/transparent areas
+      tmpCtx.fillStyle = '#ffffff'; // or whatever background you want
+      tmpCtx.fillRect(0, 0, tmp.width, tmp.height);
+
+      tmpCtx.drawImage(canvas, 0, 0, tmp.width, tmp.height);
       workCanvas = tmp;
+    } else {
+      // OPTIONAL: also fill background on the original canvas
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // single quick encode (0.8 quality WebP)
+    // encode as JPEG instead of WebP
     const blob = await new Promise<Blob>((res, rej) =>
-      workCanvas.toBlob(b => (b ? res(b) : rej('toBlob fail')), 'image/webp', 0.8),
+      workCanvas.toBlob(
+        b => (b ? res(b) : rej('toBlob fail')),
+        'image/jpeg',
+        0.8, // quality (0–1)
+      ),
     );
 
-    const file = new File([blob], 'avatar.webp', { type: 'image/webp' });
+    const file = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
     updateAvatar(file);
   };
 
