@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cleanUploadsFolder } from '@/app/lib/utils/files';
 
-export const runtime = 'nodejs';
-
 export async function POST() {
   try {
     await cleanUploadsFolder();

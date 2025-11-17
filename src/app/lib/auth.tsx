@@ -1,9 +1,9 @@
 'use server';
 
-import { getCollection } from '@/lib/database/db';
+import { getDB } from '@/lib/database/d1db';
 import { LoginFormSchema, RegisterFormSchema } from '@/lib/database/rules';
 import { createSession } from '@/lib/database/session';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -17,77 +17,86 @@ export type AuthResponseType = {
   message?: string;
 };
 
-export async function register(state: unknown, formData: FormData): Promise<AuthResponseType> {
-  //Validates form fields using zod.
-  const validatedFields = RegisterFormSchema.safeParse({
+type UserType = {
+  UserID: number;
+  UserEmail: string;
+  UserPassword: string;
+};
+
+const db = getDB();
+
+export async function register(_: unknown, formData: FormData): Promise<AuthResponseType> {
+  //  Validate input via Zod
+  const validated = RegisterFormSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
   });
 
-  //If validation fails, return the errors and the email field value.
-  if (!validatedFields.success)
-    return { errors: validatedFields.error.flatten().fieldErrors, email: formData.get('email')?.toString() };
+  if (!validated.success) {
+    return {
+      errors: validated.error.flatten().fieldErrors,
+      email: formData.get('email')?.toString(),
+    };
+  }
 
-  //If validation succeeds, extract the email and password from the validated fields.
-  const { email, password } = validatedFields.data;
+  const { email, password } = validated.data;
 
-  //Connect to the MongoDB database and get the users collection.
-  const userCollection = await getCollection('users');
+  // Check if user already exists
+  const existingUser = await db
+    .prepare('SELECT 1 FROM Users WHERE UserEmail = ? LIMIT 1')
+    .bind(email)
+    .first<UserType>();
 
-  //Check if the user already exists in the database.
-  if (!userCollection) return { errors: { email: 'Server Error!', password: [], confirmPassword: [] }, email };
+  if (existingUser) {
+    return {
+      errors: { email: 'Email already exists!', password: [], confirmPassword: [] },
+      email,
+    };
+  }
 
-  //Check if the email already exists in the database.
-  const existingUser = await userCollection?.findOne({ email });
-  if (existingUser) return { errors: { email: 'Email already exists!', password: [], confirmPassword: [] }, email };
+  // Hash password (bcrypt.hash already handles salt)
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  //Hash the password before saving it to the database
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  //  Save new user
+  await db.prepare('INSERT INTO Users (UserEmail, UserPassword) VALUES (?, ?)').bind(email, hashedPassword).run();
 
-  // Save the new user to the database.
-  await userCollection?.insertOne({ email, password: hashedPassword });
-
-  //return { message: 'User created successfully!', errors: {}, email: '' };
-
+  // Redirect to dashboard
   redirect('/createcv');
 }
 
-export async function login(state: unknown, formData: FormData): Promise<AuthResponseType> {
-  //Validates form fields using zod.
-  const validatedFields = LoginFormSchema.safeParse({
+export async function login(_: unknown, formData: FormData): Promise<AuthResponseType> {
+  const validated = LoginFormSchema.safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
   });
 
-  //If validation fails, return the errors and the email field value.
-  if (!validatedFields.success)
-    return { errors: validatedFields.error.flatten().fieldErrors, email: formData.get('email')?.toString() };
+  if (!validated.success) {
+    return {
+      errors: validated.error.flatten().fieldErrors,
+      email: formData.get('email')?.toString(),
+    };
+  }
 
-  //If validation succeeds, extract the email and password from the validated fields.
-  const { email, password } = validatedFields.data;
+  const { email, password } = validated.data;
 
-  //Connect to the MongoDB database and get the users collection.
-  const userCollection = await getCollection('users');
+  // Only fetch what you need; ensure the query can use an index on UserEmail
+  const user = await db
+    .prepare('SELECT UserID, UserPassword FROM Users WHERE UserEmail = ? LIMIT 1')
+    .bind(email)
+    .first<UserType>();
 
-  //Check if the user already exists in the database.rror!', password: [], confirmPassword: [] }, email };
-  if (!userCollection) return { errors: { email: ['Server Error!'], password: [] }, email };
+  if (!user) {
+    return { errors: { email: ['Email not registered'], password: [] }, email };
+  }
 
-  //Check if the email already exists in the database.
-  const existingUser = await userCollection?.findOne({ email });
-  if (!existingUser) return { errors: { email: ['Email not registered'], password: [] }, email };
+  const ok = await bcrypt.compare(password, user.UserPassword);
+  if (!ok) {
+    return { errors: { email: [], password: ['invalid password'] }, email };
+  }
 
-  //Compare the password with the hashed password in the database.
-  const matchPassword = await bcrypt.compare(password, existingUser.password);
-
-  if (!matchPassword) return { errors: { email: [], password: ['invalid password'] }, email };
-
-  //If the user is not saved successfully, return an error.
-  await createSession(existingUser._id.toString());
-
-  //Redirect to the dashboard page after successful registration.
-  redirect('/createcv');
+  await createSession(String(user.UserID));
+  redirect('/createcv'); // never returns
 }
 
 export async function logout() {

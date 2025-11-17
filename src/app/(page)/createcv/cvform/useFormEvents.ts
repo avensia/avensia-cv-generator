@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { ObjectId } from 'mongodb';
 import { useCv } from '../useCv';
 import { useLoader } from '@/app/context/LoaderContext';
+import uploadPhoto from '@/app/services/uploudPhoto';
 
-export function useFormEvents(initialData: CvData & { _id?: string | ObjectId }) {
+export function useFormEvents(initialData: CvData) {
   const { saveCv } = useCv({ initialData });
   const [formState, setFormState] = useState<CvData>(initialData);
-  const [cvId, setCvId] = useState<string>(initialData._id?.toString() ?? '');
+  const [cvId, setCvId] = useState<string>(initialData?.cvId ?? '');
   const [imgPreviewUrl, setImgPreviewUrl] = useState<string | null>(null);
   const [imgFile, setImgFile] = useState<File | null>(null);
   const [isSaveSuccess, setSaveSuccess] = useState<{ status: boolean; id: string; errorMessage?: string }>({
@@ -23,13 +23,7 @@ export function useFormEvents(initialData: CvData & { _id?: string | ObjectId })
 
       // only upload if user selected a new file
       if (imgFile) {
-        const body = new FormData();
-        body.append('file', imgFile);
-
-        const res = await fetch('/api/blob-upload', { method: 'POST', body });
-        if (!res.ok) throw new Error('Image upload failed');
-        const data = await res.json();
-        imgUrl = data.url;
+        imgUrl = await uploadPhoto(imgFile);
       }
 
       const payload = { ...formState, imgDataUrl: imgUrl };

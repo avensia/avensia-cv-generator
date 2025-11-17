@@ -1,109 +1,153 @@
-import { getCollection } from '@/lib/database/db';
+import { getDB } from '@/lib/database/d1db';
 import getAuthUser from '@/lib/database/getAuthUser';
-import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
+import { hydrateCv } from './hydratecv';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   const user = await getAuthUser();
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const payload = (await req.json()) as CvData;
-    const col = await getCollection<CvData & { createdAt: Date; updatedAt: Date; userId: ObjectId }>('cvs');
-    const { insertedId } = await col.insertOne({
-      ...payload,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: new ObjectId(user.userId),
-    });
-    return NextResponse.json({ id: insertedId.toString() }, { status: 201 });
-  } catch (e) {
+    const body = (await req.json()) as CvData;
+
+    // Minimal validation
+    if (!body.fullName || !body.email) {
+      return NextResponse.json({ error: 'fullName and email are required' }, { status: 400 });
+    }
+
+    const db = getDB();
+
+    const sql = `
+      INSERT INTO Cvs
+        (FullName, ImgDataUrl, Position, Email, LinkedIn, Phone, About,
+         Education, Projects, Skills, Certificates, WorkExperience, UserID)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING CvID;
+    `;
+
+    const inserted = await db
+      .prepare(sql)
+      .bind(
+        body.fullName,
+        body.imgDataUrl ?? null,
+        body.position ?? null,
+        body.email ?? null,
+        body.linkedIn ?? null, // maps to LinkedIn column
+        body.phone ?? null,
+        body.about ?? null,
+        toJSON(body.education ?? []),
+        toJSON(body.projects ?? []),
+        toJSON(body.skills ?? []),
+        toJSON(body.certificates ?? []),
+        toJSON(body.workExperience ?? []),
+        String(user.userId), // UserID TEXT
+      )
+      .first<{ CvID: number }>();
+
+    return NextResponse.json({ id: inserted?.CvID }, { status: 201 });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
     console.error(e);
-    return NextResponse.json({ error: 'Failed to create CV' }, { status: 500 });
+    return NextResponse.json({ error: e?.message ?? 'Failed to create CV' }, { status: 500 });
   }
 }
 
 export async function GET(req: Request) {
+  const db = getDB();
   const user = await getAuthUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const col = await getCollection<CvData & { createdAt: Date; updatedAt: Date; userId: ObjectId }>('cvs');
-
-    // Check if an id param was provided
+    const queryStm = db.prepare('SELECT * FROM Cvs WHERE UserID = ?');
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 
     if (id) {
-      const doc = await col.findOne({ _id: new ObjectId(id), userId: new ObjectId(user.userId) });
-      if (!doc) {
+      const row = await queryStm.bind(id).first<CvDataDbModel>(); // as written in your code
+
+      if (!row) {
         return NextResponse.json({ error: 'CV not found or not owned by user' }, { status: 404 });
       }
-      return NextResponse.json(doc, { status: 200 });
+
+      const hydrated = hydrateCv(row);
+      return NextResponse.json(hydrated, { status: 200 });
     }
 
-    // Otherwise: just get the single CV for this user (most recent one if multiple exist)
-    const doc = await col.findOne(
-      { userId: new ObjectId(user.userId) },
-      {
-        sort: { createdAt: -1 },
-      },
-    );
+    // Otherwise: get most recent CV for this user (your SQL currently returns first match)
+    const row = await queryStm.bind(user.userId).first<CvDataDbModel>();
 
-    if (!doc) {
+    if (!row) {
       return NextResponse.json({ error: 'No CV found for this user' }, { status: 404 });
     }
 
-    return NextResponse.json(doc, { status: 200 });
+    const hydrated = hydrateCv(row);
+    return NextResponse.json(hydrated, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: 'Failed to fetch CV' }, { status: 500 });
   }
 }
 
-// server-only DB type (so filters match Mongo reality)
-type CvDoc = Omit<CvData, 'userId' | '_id'> & {
-  _id?: ObjectId;
-  userId: ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 // 👇 Updated UPDATE route
+// ============== PUT: update CV by id (D1) ==============
 export async function PUT(req: Request) {
   const user = await getAuthUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
-    const body = (await req.json()) as Partial<CvData> & { id?: string; _id?: string };
-
-    // fix the typo: "body", not "bodv"
-    const id = body.id ?? body._id;
+    const body = (await req.json()) as Partial<CvData>;
+    const id = body.cvId ?? body.cvId;
     if (!id) return NextResponse.json({ error: 'Missing CV id' }, { status: 400 });
 
-    // Create a mutable copy and remove immutable/server-managed fields
-    const safePayload: Record<string, unknown> = { ...body };
-    delete safePayload.id;
-    delete safePayload._id; // ✅ prevents "_id is immutable" error
-    delete safePayload.userId;
-    delete safePayload.createdAt;
-    delete safePayload.updatedAt;
+    const db = getDB();
 
-    const col = await getCollection<CvDoc>('cvs');
+    // Build the update list only for fields provided
+    const sets: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const args: any[] = [];
 
-    const result = await col.updateOne(
-      { _id: new ObjectId(id), userId: new ObjectId(user.userId) },
-      { $set: { ...safePayload, updatedAt: new Date() } },
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const setField = (col: string, val: any, json = false) => {
+      sets.push(`${col} = ?`);
+      args.push(json ? toJSON(val) : val ?? null);
+    };
 
-    if (result.matchedCount === 0) {
+    if ('fullName' in body) setField('FullName', body.fullName);
+    if ('imgDataUrl' in body) setField('ImgDataUrl', body.imgDataUrl);
+    if ('position' in body) setField('Position', body.position);
+    if ('email' in body) setField('Email', body.email);
+    if ('linkedIn' in body) setField('LinkedIn', body.linkedIn);
+    if ('phone' in body) setField('Phone', body.phone);
+    if ('about' in body) setField('About', body.about);
+    if ('education' in body) setField('Education', body.education, true);
+    if ('projects' in body) setField('Projects', body.projects, true);
+    if ('skills' in body) setField('Skills', body.skills, true);
+    if ('certificates' in body) setField('Certificates', body.certificates, true);
+    if ('workExperience' in body) setField('WorkExperience', body.workExperience, true);
+
+    if (sets.length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+    }
+
+    // WHERE clause (enforce ownership)
+    const sql = `
+      UPDATE Cvs
+      SET ${sets.join(', ')}
+      WHERE CvID = ? AND UserID = ?
+    `;
+
+    args.push(Number(id), String(user.userId));
+
+    const res = await db
+      .prepare(sql)
+      .bind(...args)
+      .run();
+
+    if (res.meta.changes === 0) {
       return NextResponse.json({ error: 'CV not found or not owned by user' }, { status: 404 });
     }
 
@@ -112,4 +156,8 @@ export async function PUT(req: Request) {
     console.error(e);
     return NextResponse.json({ error: 'Failed to update CV' }, { status: 500 });
   }
+}
+
+function toJSON(val: unknown) {
+  return JSON.stringify(val ?? null);
 }
