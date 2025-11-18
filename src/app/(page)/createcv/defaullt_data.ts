@@ -3,6 +3,7 @@ export const CVFormData: CvData = {
   cvId: '',
   fullName: '',
   imgDataUrl: '',
+  imgVersion: '',
   position: '',
   email: '',
   linkedIn: '',

@@ -8,8 +8,25 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "d1_databases": [
+    {
+      "binding": "cvs",
+      "database_name": "cv-tools-db-dev",
+      "database_id": "0084db35-bf13-4fa5-957e-021afbdc492e"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "cvtools-r2"
+    }
+  ],
   "env": {
     "dev": {
+      "vars": {
+        "SESSION_SECRET_KEY": "fi35VYPbaO6CY0pDhKi/ttzsaLV2303X5pbh+yIQj8Q=",
+        "ENVIRONMENT": "development"
+      },
       "d1_databases": [
         {
           "binding": "cvs",
@@ -26,7 +43,8 @@
     },
     "production": {
       "vars": {
-        "SESSION_SECRET_KEY": "fi35VYPbaO6CY0pDhKi/ttzsaLV2303X5pbh+yIQj8Q="
+        "SESSION_SECRET_KEY": "fi35VYPbaO6CY0pDhKi/ttzsaLV2303X5pbh+yIQj8Q=",
+        "ENVIRONMENT": "production"
       },
       "r2_buckets": [
         {

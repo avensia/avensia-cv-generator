@@ -59,6 +59,7 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
             coverUrl={coverUrl ?? ''}
             samplePFUrl={formData?.imgDataUrl ? formData?.imgDataUrl : samplePFUrl}
             PFurl={formData?.imgDataUrl}
+            imgVersion={formData?.imgVersion}
           />
         </View>
         <View style={styles.layout}>

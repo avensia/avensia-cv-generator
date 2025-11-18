@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageCenter } from '@/components/ui/box';
-import Header from './header';
+import Header from './components/header';
 
 type PropsType = {
   children: React.ReactNode;

@@ -123,7 +123,6 @@ export function useCv(options: UseCvOptions = {}) {
         optimisticData: next,
         revalidate: true,
         rollbackOnError: false, // keep optimistic state if the request fails
-        populateCache: true,
       },
     );
 

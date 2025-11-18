@@ -118,6 +118,7 @@ export async function PUT(req: Request) {
 
     if ('fullName' in body) setField('FullName', body.fullName);
     if ('imgDataUrl' in body) setField('ImgDataUrl', body.imgDataUrl);
+    if ('imgDataUrl' in body) setField('ImgVersion', String(body.imgVersion));
     if ('position' in body) setField('Position', body.position);
     if ('email' in body) setField('Email', body.email);
     if ('linkedIn' in body) setField('LinkedIn', body.linkedIn);

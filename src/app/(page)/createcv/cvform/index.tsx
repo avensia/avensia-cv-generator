@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import CVForm from './components/cvform';
 import { useFormEvents } from './useFormEvents';
-import { LogoutAlert } from './components/logout';
 import { SaveAlert, SaveAlertHandle } from './components/savealert';
 import { useIsUpdated } from './useIsUpdated';
 import { useUnsavedChangesPrompt } from './useUnsavedChangesPrompt';
@@ -75,7 +74,6 @@ export default function CVFormPage({ initialForm }: { initialForm: CvData }) {
           <Button variant="secondary" onClick={handleGeneratePDF} className="w-50" disabled={!initialForm?.cvId}>
             <FileText /> Generate CV as PDF
           </Button>
-          <LogoutAlert />
         </div>
       </div>
       <div className="p-5 shadow-xl/30 inset-shadow-xs">
