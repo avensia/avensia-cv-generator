@@ -2,7 +2,7 @@
 
 import React, { useActionState } from 'react';
 import { Input } from '@/components/ui/input';
-import { register } from '@/app/lib/auth';
+import { register } from '@/lib/services/auth.server';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

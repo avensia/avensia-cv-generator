@@ -12,7 +12,7 @@ import { UnsavedChangesModal } from './components/unsavedchangesmodal';
 import { H1 } from '@/components/ui/typography';
 import { FileText, Save } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { useLoader } from '@/app/context/LoaderContext';
+import { useLoader } from '@/components/shared/context/LoaderContext';
 
 export default function CVFormPage({ initialForm }: { initialForm: CvData }) {
   const saveAlertRef = useRef<SaveAlertHandle>(null);

@@ -1,13 +1,10 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
-//import { getServerSession } from 'next-auth';
-//import GlobalHeader from '@/components/header';
-//import SessionProviderClient from './components/SessionProviderClient';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import { LoaderProvider } from './context/LoaderContext';
-import SWRProviders from './context/SWRContext';
+import { LoaderProvider } from '../components/shared/context/LoaderContext';
+import SWRProviders from '../components/shared/context/SWRContext';
 import getAuthUser from '@/lib/database/getAuthUser';
 
 const poppins = Poppins({
@@ -33,22 +30,15 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.className} antialiased font-nunito-sans font-nunito `}>
-        {/* <SessionProviderClient session={session}> */}
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <LoaderProvider>
             <SWRProviders user={{ id: user?.userId ?? '' }}>
               <main>
-                {/* {session?.user && (
-                <section>
-                  <GlobalHeader />
-                </section>
-              )} */}
                 <section>{children}</section>
               </main>
             </SWRProviders>
           </LoaderProvider>
         </ThemeProvider>
-        {/* </SessionProviderClient> */}
       </body>
     </html>
   );

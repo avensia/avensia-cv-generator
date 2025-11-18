@@ -1,4 +1,4 @@
-import type { CV } from './cv.schema';
+import type { CV } from './formschema/cv.schema';
 
 const sample: CV = {
   basics: {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useActionState } from 'react';
-import { login } from '@/app/lib/auth';
+import { login } from '@/lib/services/auth.server';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';

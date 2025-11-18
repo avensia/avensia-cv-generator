@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import ImageCropper from './imagecropper';
-import { dataURLtoFile } from '@/app/lib/utils/upload';
+import { dataURLtoFile } from '@/lib/utils/upload';
 import { Upload } from 'lucide-react';
 
 type PropsType = {

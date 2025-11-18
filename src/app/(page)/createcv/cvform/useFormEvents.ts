@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCv } from '../useCv';
-import { useLoader } from '@/app/context/LoaderContext';
-import uploadPhoto from '@/app/services/uploudPhoto';
+import { useLoader } from '@/components/shared/context/LoaderContext';
+import uploadPhoto from '@/lib/services/uploud-photo.client';
 
 export function useFormEvents(initialData: CvData) {
   const { saveCv } = useCv({ initialData });

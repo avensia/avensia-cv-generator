@@ -10,7 +10,7 @@ import TextAreaFieldWithLimit from './textfieldareawithlimits';
 import WorkExperience from './formsections/workexperience';
 import { H2 } from '@/components/ui/typography';
 import { CircleX, Save } from 'lucide-react';
-import { useLoader } from '@/app/context/LoaderContext';
+import { useLoader } from '@/components/shared/context/LoaderContext';
 import { Spinner } from '@/components/ui/spinner';
 
 type PropsType = {

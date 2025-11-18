@@ -1,5 +1,5 @@
 'use client';
-import { parsePhoneNumber } from '@/app/lib/utils/parsePhoneNumber';
+import { parsePhoneNumber } from '@/lib/utils/parsePhoneNumber';
 import { FieldDescription, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

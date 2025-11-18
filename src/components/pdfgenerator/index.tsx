@@ -9,7 +9,7 @@ import Skills from './skills';
 import Certificates from './certificates';
 import Education from './education';
 import WorkExperience from './workexperience';
-import { isValueValid } from '@/app/lib/utils/validations';
+import { isValueValid } from '@/lib/utils/validations';
 
 const coverUrl = '/assets/images/CoverPhoto-crop.jpg';
 const samplePFUrl = '/assets/images/avensia-logo-light.jpg';
