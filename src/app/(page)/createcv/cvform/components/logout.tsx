@@ -9,7 +9,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { logout } from '@/app/lib/auth';
+import { logout } from '@/lib/services/auth.server';
 import { LogOut } from 'lucide-react';
 
 export function LogoutAlert() {

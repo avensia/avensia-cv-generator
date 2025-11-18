@@ -1,4 +1,4 @@
-import { isValueValid } from '@/app/lib/utils/validations';
+import { isValueValid } from '@/lib/utils/validations';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 
 const LH = 1.4;
