@@ -25,7 +25,6 @@
       ]
     },
     "production": {
-      "name": "avensia-cv-tools-production",
       "vars": {
         "SESSION_SECRET_KEY": "fi35VYPbaO6CY0pDhKi/ttzsaLV2303X5pbh+yIQj8Q="
       },

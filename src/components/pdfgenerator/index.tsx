@@ -71,7 +71,7 @@ export const CreatePDF = ({ formData }: { formData?: CvData }) => {
             </Section>
           )}
           {isValueValid(formData?.projects) && (
-            <Section title="Projects" hr={false} wrap>
+            <Section title="Avensia Customers" hr={false} wrap>
               <Projects projects={formData?.projects} />
             </Section>
           )}
