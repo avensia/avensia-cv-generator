@@ -1,23 +1,37 @@
 'use client';
 
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import React, { useEffect } from 'react';
-import { useSearchCv } from '../useSearch';
+import { useRouter } from 'next/navigation';
 
 const SearchForm = () => {
-  const { cvs } = useSearchCv();
+  const [searchText, setSearchText] = useState<string>('');
+  const router = useRouter();
 
-  useEffect(() => {
-    console.log(cvs);
-  }, [cvs]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.currentTarget.value);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); // stop page reload
+    const segment = searchText ? `?name=${encodeURIComponent(searchText)}` : '';
+    router.replace(`/search${segment}`);
+  };
 
   return (
-    <FieldSet className="flex">
-      <Input type="text" name="name" value="" />
-      <Button>Search</Button>
-    </FieldSet>
+    <form onSubmit={handleSubmit}>
+      <FieldSet className="flex flex-row">
+        <Input
+          type="text"
+          name="name"
+          onChange={handleChange}
+          value={searchText}
+          autoComplete="off"
+          placeholder="search using resouce name"
+        />
+        <Button type="submit">Search</Button>
+      </FieldSet>
+    </form>
   );
 };
 

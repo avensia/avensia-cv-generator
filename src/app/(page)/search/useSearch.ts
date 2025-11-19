@@ -10,13 +10,13 @@ const swrFetcher = async (url: string) => {
   return await res.json();
 };
 
-export function useSearchCv() {
-  const { data, error, isLoading, mutate } = useSWR('api/find-cv', swrFetcher);
+export function useSearchCv(name: string) {
+  const { data, error, isLoading, mutate } = useSWR(`api/find-cv?name=${name}`, swrFetcher);
 
   const refresh = () => mutate();
 
   return {
-    cvs: data,
+    cvs: data as CvData[],
     error,
     loading: isLoading,
     refresh,

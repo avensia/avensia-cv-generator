@@ -1,8 +1,8 @@
 import React from 'react';
-import SearchForm from './components/search-form';
+import SearchClient from './components/search-client';
 
 const Search = () => {
-  return <SearchForm />;
+  return <SearchClient />;
 };
 
 export default Search;

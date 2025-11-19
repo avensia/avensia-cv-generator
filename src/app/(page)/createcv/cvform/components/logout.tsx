@@ -12,13 +12,21 @@ import { Button } from '@/components/ui/button';
 import { logout } from '@/lib/services/auth.server';
 import { LogOut } from 'lucide-react';
 
-export function LogoutAlert() {
+type PropsType = {
+  buttonElement?: React.ReactNode;
+};
+
+export function LogoutAlert({ buttonElement }: PropsType) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="secondary" className="mb-5" type="submit">
-          <LogOut /> Logout
-        </Button>
+        {buttonElement ? (
+          buttonElement
+        ) : (
+          <Button variant="secondary" className="mb-5" type="submit">
+            <LogOut /> Logout
+          </Button>
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

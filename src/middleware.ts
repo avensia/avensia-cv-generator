@@ -16,7 +16,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 // Routes that require user authentication
-const protectedRoutes = ['/createcv', '/previewcv'];
+const protectedRoutes = ['/createcv', '/previewcv', '/search'];
 
 // Routes that should only be accessible when user is not logged in
 const publicRoutes = ['/login', '/register'];
