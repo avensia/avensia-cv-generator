@@ -11,7 +11,7 @@
  *  - Allows all other requests to continue as normal
  */
 
-import { decrypt } from '@/lib/database/session'; // Function to decrypt or verify session data
+import { getSession } from '@/lib/database/session'; // Function to decrypt or verify session data
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -36,7 +36,11 @@ export async function middleware(req: NextRequest) {
   const cookie = req.cookies.get('session')?.value ?? null;
 
   // Attempt to decrypt session data; if decryption fails or cookie is missing, set session to null
-  const session = cookie ? await decrypt(cookie).catch(() => null) : null;
+  const session = cookie
+    ? await getSession()
+        .decrypt(cookie)
+        .catch(() => null)
+    : null;
 
   //If route is protected and user is not authenticated, redirect to login
   if (isProtectedRoute && !session) {

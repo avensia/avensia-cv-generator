@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import CVForm from './components/cvform';
 import { useFormEvents } from './useFormEvents';
-import { LogoutAlert } from './components/logout';
 import { SaveAlert, SaveAlertHandle } from './components/savealert';
 import { useIsUpdated } from './useIsUpdated';
 import { useUnsavedChangesPrompt } from './useUnsavedChangesPrompt';

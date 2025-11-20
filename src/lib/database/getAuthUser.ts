@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
-import { decrypt } from './session';
+import { getSession } from './session';
 
-export type SessionUser = { userId: string };
+export type SessionUser = { userId: string; userRole: string };
 
 export default async function getAuthUser(): Promise<SessionUser | null> {
   const cookieStore = await Promise.resolve(cookies()); // works if sync or async
@@ -9,6 +9,6 @@ export default async function getAuthUser(): Promise<SessionUser | null> {
 
   if (!session) return null;
 
-  const user = await decrypt(session);
-  return user as SessionUser | null; // simplest typing
+  const user = await getSession().decrypt(session);
+  return user as SessionUser | null;
 }

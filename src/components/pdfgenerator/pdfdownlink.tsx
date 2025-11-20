@@ -24,7 +24,7 @@ const Pdfdownlink = (props: PropsType) => {
         {({ loading }) => (
           <Button variant="secondary">
             <FileDown />
-            {loading ? 'Generating PDF...' : 'Download PDF'}
+            {loading ? 'Generating CV...' : 'Download CV as PDF'}
           </Button>
         )}
       </PDFDownloadLink>

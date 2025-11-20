@@ -6,14 +6,18 @@ import { FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 
-const SearchForm = () => {
-  const [searchText, setSearchText] = useState<string>('');
+type PropsType = {
+  searchName: string;
+};
+
+const SearchForm = ({ searchName }: PropsType) => {
+  const [searchText, setSearchText] = useState<string>(searchName);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchText(e.currentTarget.value);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // stop page reload
+    e.preventDefault();
     const segment = searchText ? `?name=${encodeURIComponent(searchText)}` : '';
     router.replace(`/search${segment}`);
   };
