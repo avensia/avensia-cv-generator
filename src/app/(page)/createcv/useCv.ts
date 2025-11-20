@@ -32,7 +32,11 @@ export function useCv(options: UseCvOptions = {}) {
     return (await res.json()) as CvWithId;
   };
 
-  const { data, error, isLoading, mutate } = useSWR<CvWithId>(endpoint, swrFetcher);
+  const { data, error, isLoading, mutate } = useSWR<CvWithId>(endpoint, swrFetcher, {
+    // 404 already returns initialData; leave other errors surfaced
+    revalidateOnFocus: false,
+    dedupingInterval: 1000,
+  });
 
   // convenient alias — forces a revalidation
   const refresh = () => mutate();
@@ -119,7 +123,6 @@ export function useCv(options: UseCvOptions = {}) {
         optimisticData: next,
         revalidate: true,
         rollbackOnError: false, // keep optimistic state if the request fails
-        populateCache: true,
       },
     );
 
