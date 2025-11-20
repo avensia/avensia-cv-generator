@@ -26,15 +26,16 @@ type HeadingProps = {
   coverUrl: string;
   samplePFUrl: string;
   PFurl?: string;
+  imgVersion?: string;
 };
 
-export const Heading = ({ coverUrl, samplePFUrl, PFurl }: HeadingProps) => (
+export const Heading = ({ coverUrl, samplePFUrl, PFurl, imgVersion }: HeadingProps) => (
   <View>
     <Image src={coverUrl} />
     <View style={styles.profileImageWrapper}>
       <Image
         style={styles.profileImage}
-        src={PFurl ? `/api/cloudflare/fetch-photo/${encodeURIComponent(PFurl)}` : samplePFUrl}
+        src={PFurl ? `/api/cloudflare/fetch-photo/${encodeURIComponent(PFurl)}?v=${imgVersion}` : samplePFUrl}
       />
     </View>
   </View>

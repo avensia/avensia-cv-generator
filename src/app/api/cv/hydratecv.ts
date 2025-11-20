@@ -14,6 +14,7 @@ export function hydrateCv(row: CvDataDbModel): CvData {
     cvId: row.CvID,
     fullName: row.FullName,
     imgDataUrl: row.ImgDataUrl,
+    imgVersion: row.ImgVersion,
     position: row.Position,
     email: row.Email,
     linkedIn: row.LinkedIn,

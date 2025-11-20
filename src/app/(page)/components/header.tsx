@@ -3,6 +3,7 @@ import { ToggleTheme } from '@/components/ToggleTheme';
 import Logo from '@/components/logo';
 import DropdownMenuClient from './dropdown-menu';
 import Link from 'next/link';
+import UserNameWithAvatar from './username-with-avatar';
 
 type PropsType = {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ const Header = ({ children }: Readonly<PropsType>) => {
           <Logo />
         </Link>
         <div className="flex flex-row items-center gap-5 ">
+          <UserNameWithAvatar />
           <ToggleTheme />
           <DropdownMenuClient />
         </div>

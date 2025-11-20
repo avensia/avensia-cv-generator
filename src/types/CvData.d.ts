@@ -7,6 +7,7 @@ type CvDataDbModel = {
   CvID: string;
   FullName: string;
   ImgDataUrl: string;
+  ImgVersion: string;
   Position: string;
   Email: string;
   LinkedIn: string;
@@ -23,6 +24,7 @@ type CvData = {
   cvId: string;
   fullName: string;
   imgDataUrl: string;
+  imgVersion: string;
   position: string;
   email: string;
   linkedIn: string;

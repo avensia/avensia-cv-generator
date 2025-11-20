@@ -45,7 +45,12 @@ const ProfilePicture: React.FunctionComponent<PropsType> = props => {
         <div className="flex items-start gap-4">
           {form.imgDataUrl ? (
             <Avatar className="h-24 w-24 rounded-xl border bg-gray-300">
-              <AvatarImage src={avatarUrl ?? `/api/cloudflare/fetch-photo/${encodeURIComponent(form.imgDataUrl)}`} />
+              <AvatarImage
+                src={
+                  avatarUrl ??
+                  `/api/cloudflare/fetch-photo/${encodeURIComponent(form?.imgDataUrl)}?v=${form?.imgVersion}`
+                }
+              />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           ) : (
