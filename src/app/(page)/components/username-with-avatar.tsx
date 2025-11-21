@@ -1,22 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCv } from '../createcv/useCv';
+import AcvtAvatar from '@/components/acvt-avatar';
 
 const UserNameWithAvatar = () => {
   const { cv } = useCv();
-  const img = cv?.imgDataUrl
-    ? `/api/cloudflare/fetch-photo/${encodeURIComponent(cv?.imgDataUrl)}?v=${cv?.imgVersion}`
-    : '';
 
   return (
     <div className="flex flex-row items-center gap-5">
       <div className="text-sm">{cv?.fullName}</div>
-      <Avatar className="rounded-lg">
-        <AvatarImage src={img} alt={cv?.fullName} />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
+      <AcvtAvatar imgName={cv?.imgDataUrl} imgVersion={cv?.imgVersion} fullName={cv?.fullName} className="rounded-lg" />
     </div>
   );
 };

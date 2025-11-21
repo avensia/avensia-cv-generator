@@ -12,7 +12,7 @@ const PdfPreviewSheet = ({ cvData }: PropsType) => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="secondary" size="sm">
+        <Button variant="secondary" size="sm" className="w-full">
           Preview Cv
         </Button>
       </SheetTrigger>
