@@ -20,13 +20,17 @@ export function useFormEvents(initialData: CvData) {
     setLoading(true);
     try {
       let imgUrl = formState.imgDataUrl;
+      let incrementVersion = Number(initialData.imgVersion);
 
-      // only upload if user selected a new file
       if (imgFile) {
         imgUrl = await uploadPhoto(imgFile);
+        incrementVersion = incrementVersion += 1;
       }
 
-      const payload = { ...formState, imgDataUrl: imgUrl };
+      const payload = {
+        ...formState,
+        ...{ imgDataUrl: imgUrl, imgVersion: String(incrementVersion) },
+      };
       const { id } = await saveCv(payload);
 
       if (!cvId) setCvId(id);

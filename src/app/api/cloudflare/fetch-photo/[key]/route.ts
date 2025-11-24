@@ -53,7 +53,7 @@ export async function GET(_req: NextRequest, context: RouteContext) {
       status: 200,
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'no-store',
+        'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
       },
     });
   } catch (err) {

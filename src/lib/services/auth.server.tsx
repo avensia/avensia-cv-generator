@@ -2,7 +2,7 @@
 
 import { getDB } from '@/lib/database/d1db';
 import { LoginFormSchema, RegisterFormSchema } from '@/lib/database/rules';
-import { createSession } from '@/lib/database/session';
+import { getSession } from '@/lib/database/session';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -21,6 +21,7 @@ type UserType = {
   UserID: number;
   UserEmail: string;
   UserPassword: string;
+  RoleName: string;
 };
 
 const db = getDB();
@@ -58,8 +59,13 @@ export async function register(_: unknown, formData: FormData): Promise<AuthResp
   // Hash password (bcrypt.hash already handles salt)
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  //get user role from db
+  const defaultUserRole = await db.prepare('SELECT * FROM Roles WHERE Name = ?').bind('user').first<string>('id');
   //  Save new user
-  await db.prepare('INSERT INTO Users (UserEmail, UserPassword) VALUES (?, ?)').bind(email, hashedPassword).run();
+  await db
+    .prepare('INSERT INTO Users (UserEmail, UserPassword, UserRole) VALUES (?, ?, ?)')
+    .bind(email, hashedPassword, defaultUserRole)
+    .run();
 
   // Redirect to dashboard
   redirect('/createcv');
@@ -82,7 +88,20 @@ export async function login(_: unknown, formData: FormData): Promise<AuthRespons
 
   // Only fetch what you need; ensure the query can use an index on UserEmail
   const user = await db
-    .prepare('SELECT UserID, UserPassword FROM Users WHERE UserEmail = ? LIMIT 1')
+    .prepare(
+      `
+    SELECT 
+        u.UserID,
+        u.UserEmail,
+        u.UserPassword,
+        r.Name AS RoleName
+    FROM Users u
+    LEFT JOIN Roles r
+        ON u.UserRole = r.id
+    WHERE u.UserEmail = ?
+    LIMIT 1
+`,
+    )
     .bind(email)
     .first<UserType>();
 
@@ -95,7 +114,7 @@ export async function login(_: unknown, formData: FormData): Promise<AuthRespons
     return { errors: { email: [], password: ['invalid password'] }, email };
   }
 
-  await createSession(String(user.UserID));
+  await getSession().createSession(String(user.UserID), user.RoleName);
   redirect('/createcv'); // never returns
 }
 
