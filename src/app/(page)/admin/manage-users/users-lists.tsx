@@ -12,6 +12,10 @@ type PropsType = {
 };
 
 const UsersLists = ({ data, roles, error, className }: PropsType) => {
+  const oneChangeRole = (userId: string, roleId: string) => {
+    console.log({ userId, roleId });
+  };
+
   return (
     <div className={cn('flex flex-wrap gap-5', className)}>
       {error ? (
@@ -32,7 +36,12 @@ const UsersLists = ({ data, roles, error, className }: PropsType) => {
                   </div>
                   <ItemActions className="flex-col items-start">
                     <div className="font-semibold">Role:</div>
-                    <RoleSelector selectedValue={String(data.userRole)} roles={roles} />
+                    <RoleSelector
+                      userId={data.userId}
+                      selectedValue={String(data.userRole)}
+                      roles={roles}
+                      oneChangeRole={oneChangeRole}
+                    />
                   </ItemActions>
                 </ItemContent>
               </Item>
