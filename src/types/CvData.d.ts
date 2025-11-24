@@ -36,3 +36,5 @@ type CvData = {
   skills: string[];
   certificates: string[];
 };
+
+type CvDataWithRole = { userId: string; fullName: string; userEmail: string; userRole: string; roleName: string };
